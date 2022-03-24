@@ -1,42 +1,57 @@
 # Hive面试宝典
 
 
-## Hive的架构
+## Hive介绍
+### Hive和Hadoop的关系
+1. Hive利用hdfs存储数据，利用MapReduce查询数据  
+2. Hive的数据存储在hdfs上，简单的说hive就是hdfs的简单一种映射，比如：hive的一张表映射hdfs上的一个文件，hive的一个数据库就映射为hdfs上的文件夹  
+3. Hive是一个计算框架，他是MapReduce的一种封装，实际上他的底层还是MR，Hive就是用人们熟悉的sql对数据进行分析的  
+4. Hive执行程序是运行在Yarn上的  
+
+### Hive的特点
+1. Hive可以自由的扩展集群的规模，一般情况下不需要重启服务（世界上最大的Hadoop集群在Yahoo!，2009年的规模在4000台节点左右）  
+2. Hive支持用户自定义函数，用户可以根据自己的需求来实现自己的函数  
+3. 良好的容错性，节点出现问题SQL仍可完成执行  
+
+### Hive的缺点
+1. Hive的HQL表达能力有限。迭代式算法无法表达；数据挖掘方面不擅长  
+2. Hive的效率比较低。Hive自动生成的MapReduce作业，通常情况下不够智能化；Hive调优比较困难，粒度较粗  
+3. Hive执行延迟
+	+ Hive 在查询数据的时候，由于没有索引，需要扫描整个表，因此延迟较高  
+	+ 另外一个导致 Hive 执行延迟高的因素是 MapReduce框架，由于MapReduce 本身具有较高的延迟，因此在利用MapReduce 执行Hive查询时，也会有较高的延迟  
+	+ 相对的，数据库的执行延迟较低。当然，这个低是有条件的，即数据规模较小，当数据规模大到超过数据库的处理能力的时候，Hive的并行计算显然能体现出优势  
+
+#### 参考资料————Hive介绍
+1. [Hive原理总结](https://www.cnblogs.com/beiyi888/p/9592490.html)  
+2. [Hive简介和架构](https://blog.csdn.net/student__software/article/details/81584448)  
 
 
-## Hive存储和压缩的相关问题
-### 使用的存储格式，存储格式的区别，然后介绍下压缩格式
-
-![Hive存储压缩格式](hive_files/Hive存储压缩格式.jpg)  
-![Hive数仓分层结构](hive_files/Hive数仓分层结构.jpg)  
-![Hive数仓分层结构更为详细的说明](hive_files/Hive数仓分层结构更为详细的说明.jpg)  
-![Hive中的snappy压缩格式](hive_files/Hive中的snappy压缩格式.jpg)
-
-1. ORCfile存储格式  
-	+ 数据按行分块，每块按照列存储，不是真正意义上的列存储，可以理解为分段列存储  
-	+ 用于降低Hadoop数据存储空间和加速Hive查询速度  
-	+ ORCfile特点是压缩快，快速列存取，是RCfile的改良版本，相比RCfile能够更好的压缩，能够更快的查询，支持各种复杂的数据类型，比如datetime/decimal/struct是以二进制方式存储的  
-	+ 需要注意的是ORC在读写时候需要消耗额外的CPU资源来压缩和解压缩，当然这部分的CPU消耗是非常少的  
-2. Parquet存储格式  
-	+ 能够很好的压缩，有很好的查询性能，支持有限的模式演进，但是写速度通常比较慢  
-	+ Parquet文件是以二进制方式存储的，所以是不可以直接读取的，文件中包括该文件的数据和元数据，因此Parquet格式文件是自解析的
-3. Snappy压缩格式  
-	+ 其中压缩比bzip2 > zlib > gzip > deflate > snappy > lzo > lz4，在不同的测试场景中，会有差异，这仅仅是一个大概的排名情况  
-	+ bzip2、zlib、gzip、deflate可以保证最小的压缩，但在运算中过于消耗时间  
-	+ 从压缩性能上来看：lz4 > lzo > snappy > deflate > gzip > bzip2，其中lz4、lzo、snappy压缩和解压缩速度快，压缩比低  
-	+ 所以一般在生产环境中，经常会采用lz4、lzo、snappy压缩，以保证运算效率  
-	
-#### 参考文档————使用的存储格式，存储格式的区别，然后介绍下压缩格式
-1. [一文搞懂Hive的存储格式与压缩格式](https://blog.csdn.net/zjjcchina/article/details/120986634)  
-2. [Hive中的ODS、 DWD、 DWS、 ADS 数仓分层](https://www.cnblogs.com/zyp0519/p/15353930.html)
+## Hive架构（需要听一下视频内容）
+![Hive的架构](hive_files/Hive的架构.jpg)  
+```
+用户接口：包括 CLI、JDBC/ODBC、WebGUI。
+元数据存储：通常是存储在关系数据库如 mysql , derby中。
+解释器、编译器、优化器、执行器。
+用户接口主要由三个：CLI、JDBC/ODBC和WebGUI。其中，CLI为shell命令行；JDBC/ODBC是Hive的JAVA实现，与传统数据库JDBC类似；WebGUI是通过浏览器访问Hive。
+元数据存储：Hive 将元数据存储在数据库中。Hive 中的元数据包括表的名字，表的列和分区及其属性，表的属性（是否为外部表等），表的数据所在目录等。
+解释器、编译器、优化器完成 HQL 查询语句从词法分析、语法分析、编译、优化以及查询计划的生成。生成的查询计划存储在 HDFS 中，并在随后有 MapReduce 调用执行。
+```
 
 
-## Hive分区分桶的相关问题
-![Hive分区及其优势](hive_files/Hive分区及其优势.jpg)  
-### 动态分区静态分区  
+## Hive索引
+1. 即从3.0开始索引已经被移除，有一些可替代的方案可能与索引类似：
+	+ 具有自动重写的物化视图可以产生非常相似的结果，Hive2.3.0增加了对物化视图视图的支持  
+	+ 使用列式文件格式（(Parquet、ORC）–他们可以进行选择性扫描；甚至可以跳过整个文件/块。很显然，例如我们创建表时使用的ORC格式就已经具有了索引的功能  
+2. 那hive为什么删除了索引：
+	+ 由于Hive是针对海量数据存储的，创建索引需要占用大量的空间，最主要的是hive索引无法自动进行刷新，也就是当新的数据加入时候，无法为这些数据自动加入索引
+
+#### 参考资料————Hive索引
+1. [Hadoop Hive概念学习系列之hive里的索引](https://www.cnblogs.com/zlslch/p/6105294.html)  
+2. [Hive中索引的使用及注意事项](https://blog.csdn.net/i000zheng/article/details/80435610)  
+3. [Hive索引](https://blog.csdn.net/qq_33265875/article/details/113877932)  
 
 
-## Hive优化的相关问题  
+## Hive优化的相关问题（需要听一下视频内容）
 ### 控制Hive中的map数  
 1. input的文件总个数，input的文件大小，集群设置的文件块大小  
 2. 举例子
@@ -93,7 +108,7 @@
 
 ### 小文件有什么样的危害？
 1. 从Hive的角度看，小文件会开很多map，一个map开一个java虚拟机jvm去执行，所以这些任务的初始化，启动，执行会浪费大量的资源，严重影响性能  
-2. 在HDFS中，每个小文件对象约占150byte，如果小文件过多会占用大量内存，这样NameNode内存容量严重制约了集群的扩展
+2. 在hdfs中，每个小文件对象约占150byte，如果小文件过多会占用大量内存，这样NameNode内存容量严重制约了集群的扩展
 	+ 每个hdfs上的文件，会消耗128字节记录其meta信息，所以大量小文件会占用大量内存  
 
 ### 如何避免小文件带来的危害？
@@ -162,16 +177,91 @@
 3. [hive优化之——控制hive任务中的map数和reduce数](http://lxw1234.com/archives/2015/04/15.htm)  
 
 
-## Hive分区分桶
+## Hive分区分桶的相关问题
+![Hive分区及其优势](hive_files/Hive分区及其优势.jpg)  
+### 动态分区静态分区  
+1. 静态分区与动态分区的主要区别在于静态分区是手动指定，而动态分区是通过数据来进行判断  
+2. 详细来说，静态分区的列实在编译时期，通过用户传递来决定的；动态分区只有在SQL执行时才能决定  
+
+
+## Hive存储和压缩的相关问题
+### Hive的数据存储
+1. Hive中所有的数据都存储在hdfs中，没有专门的数据存储格式（可支持Text，SequenceFile，ParquetFile，RCFILE等）  
+2. 只需要在创建表的时候告诉 Hive数据中的列分隔符和行分隔符，Hive就可以解析数据  
+3. Hive中包含以下数据模型：DB、Table、External Table、Partition、Bucket  
+	+ DB：在hdfs中表现为`${hive.metastore.warehouse.dir}`目录下一个文件夹  
+	+ Table：在hdfs中表现所属db目录下一个文件夹，普通表删除表后，hdfs上的文件都删了  
+	+ External Table：外部表, 与table类似，不过其数据存放位置可以在任意指定路径，外部表删除后，hdfs上的文件没有删除，只是把文件删除了  
+	+ Partition：在hdfs中表现为table目录下的子目录  
+	+ Bucket：桶在hdfs中表现为同一个表目录下根据hash散列之后的多个文件，会根据不同的文件把数据放到不同的文件中  
+
+### 使用的存储格式，存储格式的区别，然后介绍下压缩格式
+![Hive存储压缩格式](hive_files/Hive存储压缩格式.jpg)  
+![Hive数仓分层结构](hive_files/Hive数仓分层结构.jpg)  
+![Hive数仓分层结构更为详细的说明](hive_files/Hive数仓分层结构更为详细的说明.jpg)  
+![Hive中的snappy压缩格式](hive_files/Hive中的snappy压缩格式.jpg)
+1. ORCfile存储格式  
+	+ 数据按行分块，每块按照列存储，不是真正意义上的列存储，可以理解为分段列存储  
+	+ 用于降低Hadoop数据存储空间和加速Hive查询速度  
+	+ ORCfile特点是压缩快，快速列存取，是RCfile的改良版本，相比RCfile能够更好的压缩，能够更快的查询，支持各种复杂的数据类型，比如datetime/decimal/struct是以二进制方式存储的  
+	+ 需要注意的是ORC在读写时候需要消耗额外的CPU资源来压缩和解压缩，当然这部分的CPU消耗是非常少的  
+2. Parquet存储格式  
+	+ 能够很好的压缩，有很好的查询性能，支持有限的模式演进，但是写速度通常比较慢  
+	+ Parquet文件是以二进制方式存储的，所以是不可以直接读取的，文件中包括该文件的数据和元数据，因此Parquet格式文件是自解析的
+3. Snappy压缩格式  
+	+ 其中压缩比bzip2 > zlib > gzip > deflate > snappy > lzo > lz4，在不同的测试场景中，会有差异，这仅仅是一个大概的排名情况  
+	+ bzip2、zlib、gzip、deflate可以保证最小的压缩，但在运算中过于消耗时间  
+	+ 从压缩性能上来看：lz4 > lzo > snappy > deflate > gzip > bzip2，其中lz4、lzo、snappy压缩和解压缩速度快，压缩比低  
+	+ 所以一般在生产环境中，经常会采用lz4、lzo、snappy压缩，以保证运算效率  
+	
+#### 参考文档————使用的存储格式，存储格式的区别，然后介绍下压缩格式
+1. [一文搞懂Hive的存储格式与压缩格式](https://blog.csdn.net/zjjcchina/article/details/120986634)  
+2. [Hive中的ODS、 DWD、 DWS、 ADS 数仓分层](https://www.cnblogs.com/zyp0519/p/15353930.html)
+
+
+## Hive中的连接查询相关问题
+### Hive左连接和内连接的区别
+![Hive左连接和内连接的区别](hive_files/Hive左连接和内连接的区别.jpg)  
+
+### Hive左连接的底层原理
+[Hive基础二（join原理和机制，join的几种类型，数据倾斜简单处理）](https://blog.csdn.net/login_sonata/article/details/75000766)  
+
+
+## Hive中的Sql如何转化成MapReduce的
+![Hive中的Sql如何转化成MapReduce的](hive_files/Hive中的Sql如何转化成MapReduce的.jpg)    
+
+
+## Hive如何去重
+### distinct   
+1. 对select 后面所有字段去重，并不能只对一列去重   
+2. 当`distinct`应用到多个字段的时候，`distinct`必须放在开头，其应用的范围是其后面的所有字段，而不只是紧挨着它的一个字段，而且`distinct`只能放到所有字段的前面  
+3. `distinct`对`NULL`是不进行过滤的，即返回的结果中是包含`NULL`值的  
+4. 聚合函数中的`distinct`,如`count()`会过滤掉为`NULL`  
+
+### group by  
+1. 对`group by`后面所有字段去重，并不能只对一列去重  
+
+### row_number() over 窗口函数
+1. [一种巧妙的hive sql数据去重方法](https://blog.csdn.net/shuaiqig/article/details/116228534)  
+2. [Hive--数据去重及row_number()](https://blog.csdn.net/ABCDEFG0929/article/details/89190450)  
+3. [Hive(十一)--数据去重及row_number()](https://blog.csdn.net/yimingsilence/article/details/70140877)  
+
+
+## UDF和UDTF
+### 如何使用UDF和UDTF  
+### 为什么使用UDF和UDTF  
+
+
+## 如何监控一个提交后的Hive状态  
+
+
+## on 和 where 的区别  
 
 
 ## Hive集成HBase  
 
 
 ## Hive查询的时候on和where的区别
-
-
-## Hive中 left join 的底层原理
 
 
 ## Hive内部表、外部表、分区表
