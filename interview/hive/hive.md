@@ -1,7 +1,7 @@
 # Hive面试宝典
 
 
-## Hive介绍
+## Hive的介绍
 ### Hive和Hadoop的关系
 1. Hive利用hdfs存储数据，利用MapReduce查询数据  
 2. Hive的数据存储在hdfs上，简单的说hive就是hdfs的简单一种映射，比如：hive的一张表映射hdfs上的一个文件，hive的一个数据库就映射为hdfs上的文件夹  
@@ -26,7 +26,7 @@
 2. [Hive简介和架构](https://blog.csdn.net/student__software/article/details/81584448)  
 
 
-## Hive架构（需要听一下视频内容）
+## Hive的架构（需要听一下视频内容）
 ![Hive的架构](hive_files/Hive的架构.jpg)  
 ```
 用户接口：包括 CLI、JDBC/ODBC、WebGUI。
@@ -38,7 +38,7 @@
 ```
 
 
-## Hive索引
+## Hive的索引
 1. 即从3.0开始索引已经被移除，有一些可替代的方案可能与索引类似：
 	+ 具有自动重写的物化视图可以产生非常相似的结果，Hive2.3.0增加了对物化视图视图的支持  
 	+ 使用列式文件格式（(Parquet、ORC）–他们可以进行选择性扫描；甚至可以跳过整个文件/块。很显然，例如我们创建表时使用的ORC格式就已经具有了索引的功能  
@@ -178,7 +178,12 @@
 
 
 ## Hive分区分桶的相关问题
-![Hive分区及其优势](hive_files/Hive分区及其优势.jpg)  
+### Hive分区及其优势
+1. Hive中数据库，表，及分区都是在HDFS存储的一个抽象  
+2. Hive中的一个分区对应的就是HDFS的一个目录，目录名就是分区字段
+3. 如果一个表中有大量的数据，我们全部拿出来做查词的功能，耗时比较长，查询念咬慢  
+4. 使用了分区，就可以做到用到了那个分区就拿那个分区中的数据方便了查询．提高了查词的效率  
+
 ### 动态分区静态分区  
 1. 静态分区与动态分区的主要区别在于静态分区是手动指定，而动态分区是通过数据来进行判断  
 2. 详细来说，静态分区的列实在编译时期，通过用户传递来决定的；动态分区只有在SQL执行时才能决定  
@@ -221,14 +226,24 @@
 
 ## Hive中的连接查询相关问题
 ### Hive左连接和内连接的区别
-![Hive左连接和内连接的区别](hive_files/Hive左连接和内连接的区别.jpg)  
+1. 内连接：连接的键匹配上就连接，没有匹配上就过滤掉  
+2. 左连接：以左表为基准，与右表做关联，关联上则连接，右表关联不上的则为null  
 
-### Hive左连接的底层原理
-[Hive基础二（join原理和机制，join的几种类型，数据倾斜简单处理）](https://blog.csdn.net/login_sonata/article/details/75000766)  
+### Hive左连接的底层原理  
+**参考on和where的理解二**
+
+#### 补充文档记得处理一下：
+[1](https://www.cnblogs.com/jnba/p/10673747.html)  
+[2](https://blog.csdn.net/helloxiaozhe/article/details/87910386)  
 
 
-## Hive中的Sql如何转化成MapReduce的
-![Hive中的Sql如何转化成MapReduce的](hive_files/Hive中的Sql如何转化成MapReduce的.jpg)    
+## Hive中的SQL如何转化成MapReduce的
+1. `Antlr`定义SQL的语法规则，完成SQL词法，语法解析，将SQL转化为抽象语法树  
+2. 遍历抽象语法树抽象出查询的基本组成单元 `QueryBlock`  
+3. 遍历`QueryBlock` ，翻译为执行操作树`OperatorTree`  
+4. 逻辑层优化器进行`OperatorTree`变换，合并不必要的`ReduceSinkOperator`，减少`shuffle`数据量  
+5. 遍厉`OperatorTree`，翻译为`MapReduce`任务  
+6. 物理层优化器进行`MapReduce`任务的变换，生成最终的执行计划  
 
 
 ## Hive如何去重
@@ -253,15 +268,69 @@
 
 
 ## 如何监控一个提交后的Hive状态  
+1. 使用java代码提交Hive，通过HiveStatement获取日志数据并解析出`application_id`  
+2. 就可以通过`application_id`去yarn上查看运行状态  
 
 
-## on 和 where 的区别  
+## Hive查询的时候on和where有什么区别  
+### 共同点
+1. on先执行，where后执行  
+2. 并且where是对连接之后的结果进行的查询条件  
+
+### 第一种理解方式
+1. 条件不为主表条件的时候，放在on和where的后面一样  
+2. 条件为主表条件的时候，放在on后面，结果为主表全量，放在where后面的时候为主表条件筛选过后的全量  
+```
+1. select * from a left join b on a.id = b.id and a.dt=20181115;
+2. select * from a left join b on a.id = b.id and b.dt=20181115;
+3. select * from a join b on a.id = b.id and a.dt=20181115;
+4. select * from a left join b on a.id = b.id  where a.dt=20181115;
+sql1: 如果是left join 在on上写主表a的条件不会生效，全表扫描。
+sql2: 如果是left join 在on上写副表b的条件会生效，但是语义与写到where 条件不同
+sql3: 如果是inner join 在on上写主表a、副表b的条件都会生效
+sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然后再join，所以在不了解join on+条件的情况下，条件尽量别写在on后，
+直接写到where后就ok了，如果where条件后写b表的过滤条件，就变成了先left join出结果再按照b条件过滤数据  
+```
+
+### 第二种理解方式
+1. `on`是在生成连接表的起作用的，`where`是生成连接表之后对连接表再进行过滤  
+2. 当使用`left join`时，无论`on`的条件是否满足，都会返回左表的所有记录，对于满足的条件的记录，两个表对应的记录会连接起来，对于不满足条件的记录，那右表字段全部是null  
+3. 当使用`right join`时，类似，只不过是全部返回右表的所有记录  
+4. 当使用`inner join`时，功能与`where`完全相同  
+```
+经过亲测后，更加深了对on和where的理解，得出以下结论：
+
+0. on后的条件如果有过滤主表的条件，则结果对于不符合该条件的主表数据也会原条数保留，只是不匹配右表数据而已。对于on后面对右表的过滤条件，连接时会用该条件直接过滤右表数据后再和左边进行左连接。总之，对于不满足on后面的所有条件的数据，左表会在结果数据中原条数保留数据，只是不匹配右表数据而已。不满足条件的右表数据各字段会直接以NULL连接主表。
+1.ON后对左表的筛选条件对于结果行数会被忽略，但会影响结果中的匹配右表数据，因为只有符合左表条件的数据才会去和符合条件的右表数据进行匹配，不符合条件的左表数据会保留在最后结果中，但匹配的右表数据都是NULL.因此，对于需要过滤左表数据的话，需要把过滤条件放到where后面。
+2.ON后的左表条件（单独对左表进行的筛选条件）对于结果行数无影响，还是会返回所有左表的数据，但和右表匹配数据时，系统只会拿左表符合条件（ON后的对左表过滤条件）的数据去和右表符合条件（ON后的对右表过滤条件）的数据进行匹配抓取数据，而不符合条件的左表数据还是会出现在结果列表中，只是对应的右表数据都是NULL。
+3.ON后的右表条件（单独对右表进行的筛选条件）会先对右表进行数据筛选后再和左表做连接查询，对结果行数有影响（当左表对右表是一对多时），但不会影响左表的显示行数，然后拿符合条件的右表数据去和符合条件的左表数据进行匹配。
+4.Where还是对连接后的数据进行过滤筛选，这个无异议。
+5.匹配数据时无论左右表，都是拿符合ON后的过滤条件去做数据匹配，不符合的会保留左表数据，用NULL填充右表数据。
+
+综上得出，ON后面对于左表的过滤条件，在最后结果行数中会被忽略，并不会先去过滤左表数据再连接查询，但是ON后的右表条件会先过滤右表数据再连接左表进行查询。
+连接查询时，都是用符合ON后的左右表的过滤条件的数据进行连接查询，只有符合左右表过滤条件的数据才能正确匹配，剩下的左表数据会正常出现在结果集中，但匹配的右表数据是NULL。因此对于左表的过滤条件切记要放到Where后，对于右表的过滤条件要看情况了。如果需要先过滤右表数据就把条件放到ON后面即可。
+```
+
+#### 参考文档————Hive查询的时候on和where有什么区别
+1. [hive join on 条件 与 where 条件区别](https://www.cnblogs.com/jiangxiaoxian/p/9965978.html)  
+2. [SQL中条件放在on后与where后的区别](https://www.cnblogs.com/itjeff/archive/2014/01/17/3524236.html)  
 
 
 ## Hive集成HBase  
+1. 将Hbase的客户端`jar`拷贝至`Hive/lib`目录下  
+2. 修改`hive/conf`下的`hive-site.xml`配置文件，添加如下属性：  
+	```
+	<poperty>
+		<name>hbase.zookeeper.quorum</name>
+		<value>hadoop</value>
+	</poperty>
+	```
+3. 启动Hive，创建表管理表`hbase_table_1`，指定数据存储在Hbase表中，主要是通过`stored by HBaseStorageHandler`类来实现  
+4. 往Hive表`hbase_table_1`表中插入数据   
 
-
-## Hive查询的时候on和where的区别
+#### 参考文档————Hive集成HBase
+1. [如何整合hive和hbase](https://zhuanlan.zhihu.com/p/74041611)  
+2. [HiveHbase集成实践](https://www.cnblogs.com/cssdongl/p/6857891.html)  
 
 
 ## Hive内部表、外部表、分区表
