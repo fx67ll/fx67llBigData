@@ -1,58 +1,16 @@
 # Hive面试宝典
 
+
 ## Hive的架构
-
-
-## Hive分区分桶
-### 动态分区静态分区  
-
-
-## Hive集成HBase  
-
-
-## Hive查询的时候on和where的区别
-
-
-## Hive中 left join 的底层原理
-
-
-## Hive内部表、外部表、分区表
-
-
-## Hive和Mysql的区别（真的会有弱智问这种问题？）
-
-
-## Hive数据倾斜
-
-
-## Hive自定义函数实现了什么函数什么接口  
-
-
-## Hive-sql如何查询A表中B表不存在的数据  
-
-
-## Hive中sortby/orderby/clusterby/distrbuteby
-
-
-## Hive中split/coalesce/collect list
-
-
-## null在Hive底层中如何存储
-
-
-## Hive有哪些保存元数据的方式
-
-
-## 生产环境中为什么建议使用外部表
 
 
 ## Hive存储和压缩的相关问题
 ### 使用的存储格式，存储格式的区别，然后介绍下压缩格式
 
-![B站视频](hive_files/1.jpg)  
-![B站视频中的DWD和DWS](hive_files/3.jpg)  
-![B站视频中的DWD和DWS更为详细的说明](hive_files/4.jpg)  
-![B站视频中的snappy压缩格式](hive_files/5.jpg)
+![Hive存储压缩格式](hive_files/Hive存储压缩格式.jpg)  
+![Hive数仓分层结构](hive_files/Hive数仓分层结构.jpg)  
+![Hive数仓分层结构更为详细的说明](hive_files/Hive数仓分层结构更为详细的说明.jpg)  
+![Hive中的snappy压缩格式](hive_files/Hive中的snappy压缩格式.jpg)
 
 1. ORCfile存储格式  
 	+ 数据按行分块，每块按照列存储，不是真正意义上的列存储，可以理解为分段列存储  
@@ -68,16 +26,17 @@
 	+ 从压缩性能上来看：lz4 > lzo > snappy > deflate > gzip > bzip2，其中lz4、lzo、snappy压缩和解压缩速度快，压缩比低  
 	+ 所以一般在生产环境中，经常会采用lz4、lzo、snappy压缩，以保证运算效率  
 	
-#### 参考文档
+#### 参考文档————使用的存储格式，存储格式的区别，然后介绍下压缩格式
 1. [一文搞懂Hive的存储格式与压缩格式](https://blog.csdn.net/zjjcchina/article/details/120986634)  
 2. [Hive中的ODS、 DWD、 DWS、 ADS 数仓分层](https://www.cnblogs.com/zyp0519/p/15353930.html)
 
 
 ## Hive分区分桶的相关问题
-![B站视频](hive_files/2.jpg)  
+![Hive分区及其优势](hive_files/Hive分区及其优势.jpg)  
+### 动态分区静态分区  
 
 
-## Hive的优化  
+## Hive优化的相关问题  
 ### 控制Hive中的map数  
 1. input的文件总个数，input的文件大小，集群设置的文件块大小  
 2. 举例子
@@ -122,7 +81,7 @@
 	+ 看上去，貌似这两种有些矛盾，一个是要合并小文件，一个是要把大文件拆成小文件，这点正是重点需要关注的地方  
 	+ 根据实际情况，控制map数量需要遵循两个原则：第一是使大数据量利用合适的map数，第二是使单个map任务处理合适的数据量  
 	
-#### 参考文档
+#### 参考文档————控制Hive中的map数
 1. [hive优化之——控制hive任务中的map数和reduce数](http://lxw1234.com/archives/2015/04/15.htm)  
 
 
@@ -197,7 +156,54 @@
 	set hive.merge.smallfiles.avgsize=16000000;
 	```
 
-#### 参考文档
+#### 参考文档————Hive小文件的相关问题
 1. [Hadoop的Archive归档命令使用指南 ](https://www.cnblogs.com/staryea/p/8603112.html)  
 2. [关于hive中的reduce个数的设置](https://www.cnblogs.com/gxgd/p/9431525.html)  
 3. [hive优化之——控制hive任务中的map数和reduce数](http://lxw1234.com/archives/2015/04/15.htm)  
+
+
+## Hive分区分桶
+
+
+## Hive集成HBase  
+
+
+## Hive查询的时候on和where的区别
+
+
+## Hive中 left join 的底层原理
+
+
+## Hive内部表、外部表、分区表
+
+
+## Hive和Mysql的区别（真的会有弱智问这种问题？）
+
+
+## Hive数据倾斜
+
+
+## Hive自定义函数实现了什么函数什么接口  
+
+
+## Hive-sql如何查询A表中B表不存在的数据  
+
+
+## Hive中sortby/orderby/clusterby/distrbuteby
+
+
+## Hive中split/coalesce/collect list
+
+
+## null在Hive底层中如何存储
+
+
+## Hive有哪些保存元数据的方式
+
+
+## 生产环境中为什么建议使用外部表
+
+
+我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
+如果您喜欢这篇文章，欢迎访问我的 [本文github仓库地址](https://github.com/fx67ll/fx67llBigData/blob/main/interview/hive/hive.md)，为我点一颗Star，Thanks~ :)  
+***转发请注明参考文章地址，非常感谢！！！***
