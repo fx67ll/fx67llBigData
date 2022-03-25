@@ -26,8 +26,19 @@
 2. [Hive简介和架构](https://blog.csdn.net/student__software/article/details/81584448)  
 
 
-## Hive的架构（需要听一下视频内容）
+## Hive的架构
 ![Hive的架构](hive_files/Hive的架构.jpg)  
+
+### Hive的架构说明一
+```
+Hive的体系结构可以分为以下几部分
+（1）用户接口主要有三个：CLI，Client 和 WUI。其中最常用的是CLI，Cli启动的时候，会同时启动一个Hive副本。Client是Hive的客户端，用户连接至Hive Server。在启动 Client模式的时候，需要指出Hive Server所在节点，并且在该节点启动Hive Server。 WUI是通过浏览器访问Hive。
+（2）Hive将元数据存储在数据库中，如mysql、derby。Hive中的元数据包括表的名字，表的列和分区及其属性，表的属性（是否为外部表等），表的数据所在目录等。
+（3）解释器、编译器、优化器完成HQL查询语句从词法分析、语法分析、编译、优化以及查询计划的生成。生成的查询计划存储在HDFS中，并在随后有MapReduce调用执行。
+（4）Hive的数据存储在HDFS中，大部分的查询、计算由MapReduce完成（包含*的查询，比如select * from tbl不会生成MapRedcue任务）。
+```
+
+### Hive的架构说明二
 ```
 用户接口：包括 CLI、JDBC/ODBC、WebGUI。
 元数据存储：通常是存储在关系数据库如 mysql , derby中。
@@ -36,6 +47,10 @@
 元数据存储：Hive 将元数据存储在数据库中。Hive 中的元数据包括表的名字，表的列和分区及其属性，表的属性（是否为外部表等），表的数据所在目录等。
 解释器、编译器、优化器完成 HQL 查询语句从词法分析、语法分析、编译、优化以及查询计划的生成。生成的查询计划存储在 HDFS 中，并在随后有 MapReduce 调用执行。
 ```
+
+#### 参考资料————Hive介绍
+1. [Hive简介和架构](https://blog.csdn.net/student__software/article/details/81584448)  
+2. [深入学习Hive应用场景及架构原理](https://blog.csdn.net/py_123456/article/details/80292267)  
 
 
 ## Hive的索引
@@ -51,8 +66,56 @@
 3. [Hive索引](https://blog.csdn.net/qq_33265875/article/details/113877932)  
 
 
-## Hive优化的相关问题（需要听一下视频内容）
-### 控制Hive中的map数  
+## Hive的优化
+**Hive优化大全，提取下面这些文章优秀的内容，并专门写一篇文章总结Hive的优化**
+1. [hive优化大全-一篇就够了](https://blog.csdn.net/young_0609/article/details/84593316)  
+2. [[一起学Hive]之十二-Hive SQL的优化](http://lxw1234.com/archives/2015/06/317.htm)  
+3. [Hive/HiveQL常用优化方法全面总结（上篇）](https://www.jianshu.com/p/8e2f2f0d4b6c)  
+4. [Hive/HiveQL常用优化方法全面总结（下篇）](https://www.jianshu.com/p/deb4a6f91d3b)  
+5. [Hive总结篇及Hive的优化](https://blog.csdn.net/yu0_zhang0/article/details/81776459)  
+6. [Hive调优及优化的12种方式](https://zhuanlan.zhihu.com/p/80718835?utm_source=qq)  
+7. 上述弄完继续看看社区有没有好的方式，记得后续要自己手动试试  
+
+### 优化大纲之一
+1. map join -> hql -> reduce join -> shuffle 会导致消耗磁盘资源，避免reduce阶段，减少shuffle开销  
+2. 行列过滤，用哪个列哪哪个列，减少查询开销  
+3. 分区分桶扫描优于全表扫描，减少查询开销
+4. 设置合理的map数量。map越多jvm开一次关一次开销很大，浪费资源，map少但是存储的条数过多，处理的逻辑很复杂，会导致处理的时间长  
+5. 设置合理的reduce数量。涉及到小文件，每一个reduce都会输出一个结果文件，导致小文件越多；reduce越少的话就会降低数据处理的并行度，降低了效率  
+6. jvm重用，可以提升效率  
+7. 小文件开启map端的局部聚合，CombineFileInputFormat  
+8. 压缩，中间结果集压缩（处理要快，用snappy），最终结果集（reduce输出的结果，用bzip2，压缩比大）  
+
+### 优化大纲之二
+1. 列裁剪和分区裁剪
+2. 谓词下推
+3. sort by代替order by
+4. group by代替distinct
+5. group by配置调整
+	+ map端预聚合
+	+ 倾斜均衡配置项
+6. join基础优化
+	+ build table（小表）前置
+	+ 多表join时key相同
+	+ 利用map join特性
+	+ 分桶表map join
+	+ 倾斜均衡配置项
+7. 优化SQL处理join数据倾斜
+	+ 空值或无意义值
+	+ 单独处理倾斜key
+	+ 不同数据类型
+	+ build table过大
+8. MapReduce优化
+	+ 调整mapper数
+	+ 调整reducer数
+	+ 合并小文件
+	+ 启用压缩
+	+ JVM重用
+9. 并行执行与本地模式
+10. 严格模式
+11. 采用合适的存储格式
+
+### 合理的设置Hive中的map数  
 1. input的文件总个数，input的文件大小，集群设置的文件块大小  
 2. 举例子
 	```
@@ -95,12 +158,17 @@
 	```
 	+ 看上去，貌似这两种有些矛盾，一个是要合并小文件，一个是要把大文件拆成小文件，这点正是重点需要关注的地方  
 	+ 根据实际情况，控制map数量需要遵循两个原则：第一是使大数据量利用合适的map数，第二是使单个map任务处理合适的数据量  
+
+### 如何合理的设置Hive中的reduce数  
+**待补充**  
+
+### 其他优化方式也待补充
 	
 #### 参考文档————控制Hive中的map数
 1. [hive优化之——控制hive任务中的map数和reduce数](http://lxw1234.com/archives/2015/04/15.htm)  
 
 
-## Hive小文件的相关问题
+## Hive的小文件
 ### 什么情况下会产生小文件?
 1. 动态分区插入数据，产生大量的小文件，从而导致map数量剧增  
 2. reduce数量越多，小文件也越多(reduce的个数和输出文件是对应的)  
@@ -177,19 +245,43 @@
 3. [hive优化之——控制hive任务中的map数和reduce数](http://lxw1234.com/archives/2015/04/15.htm)  
 
 
-## Hive分区分桶的相关问题
+## Hive的分区分桶
 ### Hive分区及其优势
 1. Hive中数据库，表，及分区都是在HDFS存储的一个抽象  
 2. Hive中的一个分区对应的就是HDFS的一个目录，目录名就是分区字段
 3. 如果一个表中有大量的数据，我们全部拿出来做查词的功能，耗时比较长，查询念咬慢  
 4. 使用了分区，就可以做到用到了那个分区就拿那个分区中的数据方便了查询．提高了查词的效率  
 
+### Hive分桶及其优势
+**待补充**  
+
+**后续处理一下具体内容**  
+1. [Hive的分区表和分桶表的区别](https://blog.csdn.net/shudaqi2010/article/details/90288901)  
+2. [Hive分区表分桶表的认识与区别 ](https://www.cnblogs.com/xiaoazheng/p/15045728.html)  
+3. [深入理解 Hive 分区分桶 （Inceptor）](https://blog.csdn.net/whdxjbw/article/details/82219022)
+
 ### 动态分区静态分区  
 1. 静态分区与动态分区的主要区别在于静态分区是手动指定，而动态分区是通过数据来进行判断  
 2. 详细来说，静态分区的列实在编译时期，通过用户传递来决定的；动态分区只有在SQL执行时才能决定  
 
+#### 参考文档————Hive的分区分桶
+1. [Hive静态分区与动态分区的区别](https://blog.csdn.net/u012501054/article/details/102669002)  
+2. [Hive的静态分区和动态分区](https://www.cnblogs.com/cssdongl/p/6831884.html)  
 
-## Hive存储和压缩的相关问题
+
+## Hive内部表、外部表
+### Hive内部表和外部表的区别是什么
+**后续处理一下具体内容**  
+1. [Hive内部表和外部表的区别及如何创建](https://blog.csdn.net/qq_39783601/article/details/104934245)  
+2. [Hive表（管理表、外部表）的创建规则](https://www.cnblogs.com/leo-wong/articles/14257995.html)  
+
+### 生产环境中为什么建议使用外部表  
+1. 因为外部表不会加载数据到Hive，减少数据传输，数据还能共享  
+2. Hive不会修改数据，所以无需担心数据的损坏  
+3. 删除表时，只删除表结构，不删除数据  
+
+
+## Hive的存储和压缩
 ### Hive的数据存储
 1. Hive中所有的数据都存储在hdfs中，没有专门的数据存储格式（可支持Text，SequenceFile，ParquetFile，RCFILE等）  
 2. 只需要在创建表的时候告诉 Hive数据中的列分隔符和行分隔符，Hive就可以解析数据  
@@ -200,41 +292,111 @@
 	+ Partition：在hdfs中表现为table目录下的子目录  
 	+ Bucket：桶在hdfs中表现为同一个表目录下根据hash散列之后的多个文件，会根据不同的文件把数据放到不同的文件中  
 
-### 使用的存储格式，存储格式的区别，然后介绍下压缩格式
-![Hive存储压缩格式](hive_files/Hive存储压缩格式.jpg)  
+### 如何存储，使用的文件格式  
 ![Hive数仓分层结构](hive_files/Hive数仓分层结构.jpg)  
 ![Hive数仓分层结构更为详细的说明](hive_files/Hive数仓分层结构更为详细的说明.jpg)  
-![Hive中的snappy压缩格式](hive_files/Hive中的snappy压缩格式.jpg)
-1. ORCfile存储格式  
+1. 默认是TextFile文件格式  
+	+ 文本格式，Hive的默认格式，数据不压缩，磁盘开销大、数据解析开销大  
+	+ 对应的Hive API为：`org.apache.hadoop.mapred.TextInputFormat和org.apache.hive.ql.io.HiveIgnoreKeyTextOutputFormat;`
+	+ 可结合Gzip、Bzip2使用(系统自动检查，执行查询时自动解压)，但是使用这种方式，hive不会对数据进行切分，从而无法对数据进行并行操作  
+2. RCFile文件格式
+	+ RCFile是一种行列存储相结合的存储方式，先将数据按行进行分块再按列式存储，保证同一条记录在一个块上，避免读取多个块，有利于数据压缩和快速进行列存储  
+	+ 对应Hive API为：`org.apache.hadoop.hive.ql.io.RCFileInputFormat和org.apache.hadoop.hive.ql.io.RCFileOutputFormat;`  
+3. ORCFile文件格式
 	+ 数据按行分块，每块按照列存储，不是真正意义上的列存储，可以理解为分段列存储  
 	+ 用于降低Hadoop数据存储空间和加速Hive查询速度  
-	+ ORCfile特点是压缩快，快速列存取，是RCfile的改良版本，相比RCfile能够更好的压缩，能够更快的查询，支持各种复杂的数据类型，比如datetime/decimal/struct是以二进制方式存储的  
+	+ ORCfile特点是压缩比比较高，压缩快，快速列存取，是RCfile的改良版本，相比RCfile能够更好的压缩，更快的查询  
 	+ 需要注意的是ORC在读写时候需要消耗额外的CPU资源来压缩和解压缩，当然这部分的CPU消耗是非常少的  
-2. Parquet存储格式  
-	+ 能够很好的压缩，有很好的查询性能，支持有限的模式演进，但是写速度通常比较慢  
-	+ Parquet文件是以二进制方式存储的，所以是不可以直接读取的，文件中包括该文件的数据和元数据，因此Parquet格式文件是自解析的
-3. Snappy压缩格式  
+	+ 优点：
+	```
+	每个task只输出单个文件，减少namenode负载；
+	支持各种复杂的数据类型，比如：datetime，decima以及复杂类型struct、list、map；
+	文件中存储了一些轻量级的索引数据；
+	基于数据类型的块模式压缩：integer类型的列用行程长度编码，string类型的列使用字典编码；
+	用多个相互独立的recordReaders并行读相同的文件
+	无需扫描markers即可分割文件
+	绑定读写所需内存
+	metadata存储用protocol buffers，支持添加和删除列
+	```
+4. SequenceFile文件格式
+	+ Hadoop提供的二进制文件，Hadoop支持的标准文件  
+	+ 数据直接序列化到文件中，SequenceFile文件不能直接查看，可以通过Hadoop fs -text查看
+	+ SequenceFile具有使用方便、可分割、可压缩、可进行切片，压缩支持NONE、RECORD、BLOCK（优先）  
+	+ 对应Hive API：`org.apache.hadoop.mapred.SequenceFileInputFormat和org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat;`  
+5. Parquet文件格式  
+	+ 二进制存储，面向分析性的存储格式  
+	+ 能够很好的压缩，同时减少大量的表扫描和反序列化的时间，有很好的查询性能，支持有限的模式演进，但是写速度通常比较慢  
+	+ Parquet文件是以二进制方式存储的，所以是不可以直接读取的，文件中包括该文件的数据和元数据，因此Parquet格式文件是自解析的  
+6. 总结
+	+ TextFile 存储空间消耗比较大，并且压缩的text 无法分割和合并 查询的效率最低,可以直接存储，加载数据的速度最高  
+	+ SequenceFile 存储空间消耗最大,压缩的文件可以分割和合并 查询效率高，需要通过text文件转化来加载  
+	+ ORCFile/RCFile 存储空间最小，查询的效率最高 ，需要通过text文件转化来加载，加载的速度最低  
+	+ Parquet 格式是列式存储，有很好的压缩性能和表扫描功能  
+	+ SequenceFile/ORCFile/RCFile格式的表不能直接从本地文件导入数据，数据要先导入到TextFile格式的表中，然后再从TextFile表中导入到SequenceFile/ORCFile/RCFile表中  
+
+### 如何压缩，使用的压缩算法
+1. 我们原始数据使用的是LZO的压缩格式，因为原始数据比较大，所以选择了支持切割的LZO压缩  
+2. 清洗过的数据存到DWD层，我们在DWS中需要对清洗后的数据进行分析，所以我们DWD层使用的存储格式是Parquet，压缩格式是Snappy  
+3. 之前我们压缩还遇到过一个问题，当时之前的项目中使用的是Snappy+ORC存储，后来我发现使用Snappy+ORC 存储比ORC单独存储还多占用了近一半的空间  
+4. 后来我又对各个压缩格式及存储格式的结合做了一个测试，最终单独使用ORC存储节省了大量的空间  
+5. Snappy压缩格式  
 	+ 其中压缩比bzip2 > zlib > gzip > deflate > snappy > lzo > lz4，在不同的测试场景中，会有差异，这仅仅是一个大概的排名情况  
 	+ bzip2、zlib、gzip、deflate可以保证最小的压缩，但在运算中过于消耗时间  
 	+ 从压缩性能上来看：lz4 > lzo > snappy > deflate > gzip > bzip2，其中lz4、lzo、snappy压缩和解压缩速度快，压缩比低  
 	+ 所以一般在生产环境中，经常会采用lz4、lzo、snappy压缩，以保证运算效率  
+
+### 数据可分割
+1. 在考虑如何压缩那些将由MapReduce处理的数据时，考虑压缩格式是否支持分割是很重要的。  
+	考虑存储在HDFS中的未压缩的文件，其大小为1GB，HDFS的块大小为64MB，所以该文件将被存储为16块。  
+	将此文件用作输入的MapReduce作业会创建1个输人分片（split，也称为“分块”。对于block，我们统一称为“块”。）  
+	每个分片都被作为一个独立map任务的输入单独进行处理  
+
+2. 现在假设，该文件是一个gzip格式的压缩文件，压缩后的大小为1GB。和前面一样，HDFS将此文件存储为16块。
+	然而，针对每一块创建一个分块是没有用的，因为不可能从gzip数据流中的任意点开始读取，map任务也不可能独立于其他分块只读取一个分块中的数据。
+	gzip格式使用DEFLATE来存储压缩过的数据，DEFLATE将数据作为一系列压缩过的块进行存储。
+	问题是，每块的开始没有指定用户在数据流中任意点定位到下一个块的起始位置，而是其自身与数据流同步。
+	因此，gzip不支持分割(块)机制。 
+
+3. 在这种情况下，MapReduce不分割gzip格式的文件，因为它知道输入是gzip压缩格式的(通过文件扩展名得知)，而gzip压缩机制不支持分割机制。
+	因此一个map任务将处理16个HDFS块，且大都不是map的本地数据。
+	与此同时，因为map任务少，所以作业分割的粒度不够细，从而导致运行时间变长。
 	
+### 压缩模式说明
+1. 压缩模式评价：  
+	```
+	可使用以下三种标准对压缩方式进行评价：
+	压缩比：压缩比越高，压缩后文件越小，所以压缩比越高越好。
+	压缩时间：越快越好。
+	已经压缩的格式文件是否可以再分割：可以分割的格式允许单一文件由多个Mapper程序处理，可以更好的并行化。
+	```
+2. 压缩模式对比
+	```
+	BZip2有最高的压缩比但也会带来更高的CPU开销，Gzip较BZip2次之。
+	如果基于磁盘利用率和I/O考虑，这两个压缩算法都是比较有吸引力的算法。
+	LZO和Snappy算法有更快的解压缩速度，如果更关注压缩、解压速度，它们都是不错的选择。 
+	LZO和Snappy在压缩数据上的速度大致相当，但Snappy算法在解压速度上要较LZO更快。
+	Hadoop的会将大文件分割成HDFS block(默认64MB)大小的splits分片，每个分片对应一个Mapper程序。
+	在这几个压缩算法中 BZip2、LZO、Snappy压缩是可分割的，Gzip则不支持分割。
+	```
+
 #### 参考文档————使用的存储格式，存储格式的区别，然后介绍下压缩格式
-1. [一文搞懂Hive的存储格式与压缩格式](https://blog.csdn.net/zjjcchina/article/details/120986634)  
-2. [Hive中的ODS、 DWD、 DWS、 ADS 数仓分层](https://www.cnblogs.com/zyp0519/p/15353930.html)
+1. [Hive支持的文件格式和压缩格式及各自特点 ](https://www.cnblogs.com/sx66/p/12039248.html)  
+2. [一文搞懂Hive的存储格式与压缩格式](https://blog.csdn.net/zjjcchina/article/details/120986634)  
+3. [hive压缩算法对比](https://www.cnblogs.com/gentlemanhai/p/11275442.html)  
+4. [Hive中的ODS、 DWD、 DWS、 ADS 数仓分层](https://www.cnblogs.com/zyp0519/p/15353930.html)
 
 
-## Hive中的连接查询相关问题
+## Hive中的连接查询
 ### Hive左连接和内连接的区别
 1. 内连接：连接的键匹配上就连接，没有匹配上就过滤掉  
 2. 左连接：以左表为基准，与右表做关联，关联上则连接，右表关联不上的则为null  
 
 ### Hive左连接的底层原理  
-**参考on和where的理解二**
+**参考on和where的理解二**  
 
-#### 补充文档记得处理一下：
-[1](https://www.cnblogs.com/jnba/p/10673747.html)  
-[2](https://blog.csdn.net/helloxiaozhe/article/details/87910386)  
+**补充文档记得处理一下**  
+1. [Hive——join的使用](https://www.cnblogs.com/jnba/p/10673747.html)  
+2. [Hive中HSQL中left semi join和INNER JOIN、LEFT JOIN、RIGHT JOIN、FULL JOIN区别](https://blog.csdn.net/helloxiaozhe/article/details/87910386)  
 
 
 ## Hive中的SQL如何转化成MapReduce的
@@ -257,14 +419,18 @@
 1. 对`group by`后面所有字段去重，并不能只对一列去重  
 
 ### row_number() over 窗口函数
+
+**后续处理一下具体内容**  
 1. [一种巧妙的hive sql数据去重方法](https://blog.csdn.net/shuaiqig/article/details/116228534)  
 2. [Hive--数据去重及row_number()](https://blog.csdn.net/ABCDEFG0929/article/details/89190450)  
 3. [Hive(十一)--数据去重及row_number()](https://blog.csdn.net/yimingsilence/article/details/70140877)  
 
 
 ## UDF和UDTF
-### 如何使用UDF和UDTF  
-### 为什么使用UDF和UDTF  
+### 如何使用UDF/UDAF/UDTF  
+### 为什么使用UDF/UDAF/UDTF   
+### 你写过什么样的UDF/UDAF/UDTF  
+### Hive自定义函数实现了什么函数什么接口
 
 
 ## 如何监控一个提交后的Hive状态  
@@ -333,19 +499,40 @@ sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然�
 2. [HiveHbase集成实践](https://www.cnblogs.com/cssdongl/p/6857891.html)  
 
 
-## Hive内部表、外部表、分区表
+## Hive和MySQL的区别（真的会有弱智问这种问题？）
+1. Hive采用了类SQL的查询语言HQL（hive query language）。除了HQL之外，其余无任何相似的地方。Hive是为了数据仓库设计的  
+2. 存储位置：Hive在Hadoop上；MySQL将数据存储在设备或本地系统中  
+3. 数据更新：Hive不支持数据的改写和添加，是在加载的时候就已经确定好了；数据库可以CRUD  
+4. 索引：Hive无索引，每次扫描所有数据，底层是MR，并行计算，适用于大数据量；MySQL有索引，适合在线查询数据  
+6. 执行：Hive底层是MarReduce；MySQL底层是执行引擎  
+7. 可扩展性：Hive：大数据量，慢慢扩去吧；MySQL:相对就很少了  
 
-
-## Hive和Mysql的区别（真的会有弱智问这种问题？）
+#### 参考文档————Hive和MySQL的区别
+1. [Hive与MySQL的区别](https://blog.csdn.net/qq_39597203/article/details/89481867)  
 
 
 ## Hive数据倾斜
+### 产生的原因
+### 解决的方案
+
+**整理一下参考文档**
+1. [hive数据倾斜原因和解决方法](https://blog.csdn.net/u010670689/article/details/42920917)  
+2. [Hive中的数据倾斜](https://zhuanlan.zhihu.com/p/82616299)  
+3. [Hive学习之路 （十九）Hive的数据倾斜 ](https://www.cnblogs.com/qingyunzong/p/8847597.html)  
+4. [Hive数据倾斜案例讲解](http://www.techweb.com.cn/cloud/2020-11-03/2809569.shtml)  
 
 
-## Hive自定义函数实现了什么函数什么接口  
+## Hive底层如何存储Null值
+1. Null在hive底层默认是用'\N'来存储的  
+2. 能够经过`alter table test SET SERDEPROPERTIES('serialization.null.format' = 'a');`来修改  
+
+#### 参考文档————Hive底层如何存储Null值
+1. [说出null在hive底层如何存储](https://blog.csdn.net/qq_42246689/article/details/84702628)  
+2. [hive null的底层存储](https://www.jianshu.com/p/5334a675f014)  
+3. [hive面试--hive底层如何存储Null值](https://blog.csdn.net/weixin_44024821/article/details/102418567)  
 
 
-## Hive-sql如何查询A表中B表不存在的数据  
+## Hive如何查询A表中B表不存在的数据  
 
 
 ## Hive中sortby/orderby/clusterby/distrbuteby
@@ -354,13 +541,7 @@ sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然�
 ## Hive中split/coalesce/collect list
 
 
-## null在Hive底层中如何存储
-
-
 ## Hive有哪些保存元数据的方式
-
-
-## 生产环境中为什么建议使用外部表
 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
