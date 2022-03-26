@@ -48,9 +48,16 @@ Hive的体系结构可以分为以下几部分
 解释器、编译器、优化器完成 HQL 查询语句从词法分析、语法分析、编译、优化以及查询计划的生成。生成的查询计划存储在 HDFS 中，并在随后有 MapReduce 调用执行。
 ```
 
+### Hive有哪些保存元数据的方式  
+1. 内嵌模式：将元数据保存在本地内嵌的derby数据库中，内嵌的derby数据库每次只能访问一个数据文件，也就意味着它不支持多会话连接  
+2. 本地模式：将元数据保存在本地独立的数据库中（一般是mysql），这可以支持多会话连接  
+3. 远程模式：把元数据保存在远程独立的mysql数据库中，避免每个客户端都去安装mysql数据库  
+
 #### 参考资料————Hive介绍
 1. [Hive简介和架构](https://blog.csdn.net/student__software/article/details/81584448)  
 2. [深入学习Hive应用场景及架构原理](https://blog.csdn.net/py_123456/article/details/80292267)  
+3. [Hive元数据存储的三种模式，hive有哪些保存元数据的方式，各有什么特点。](https://blog.csdn.net/Ahuuua/article/details/105908562)  
+4. [hive安装测试及Hive元数据的三种存储方式](https://www.cnblogs.com/anlang/p/3732682.html)  
 
 
 ## Hive的索引
@@ -532,16 +539,29 @@ sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然�
 3. [hive面试--hive底层如何存储Null值](https://blog.csdn.net/weixin_44024821/article/details/102418567)  
 
 
-## Hive如何查询A表中B表不存在的数据  
+## Hive表查询技巧
+### 查询A表中B表不存在的数据  
+**题目：A、B两表，找出ID字段中，存在A表，但是不存在B表的数据。A表总共13w数据，去重后大约3W条数据，B表有2W条数据，且B表的ID字段有索引**  
+```
+select * from  B
+where (select count(1) as num from A where A.ID = B.ID) = 0
+```
 
+## Hive中函数的使用方式及区别
+### 排序函数————`sort by`/ `order by` / `cluster by` / `distrbute by`  
+1. `order by` 会对输入做全局排序，为保证全局的排序，因此只有一个reducer，会导致当输入规模较大时，需要较长的计算时间。
+2. `sort by`不是全局排序，其在数据进入reducer前完成排序。因此，如果用`sort by`进行排序，则`sort by`只保证每个reducer的输出有序，不保证全局有序。
+3. `distribute by 字段` 根据指定的字段将数据分到不同的reducer，且分发算法是hash散列，常用`sort by`结合使用，Hive要求`distribute by`语句要写在`sort by`语句之前。
+4. `cluster by 字段` 除了具有`distribute by`的功能(既可以把数据分到不同的reduce)外，还会对该字段进行排序。但是排序只能是倒序排序，不能指定排序规则为`asc`或者`desc`
+5. 因此：
+	+ 当数据量规模较大时，不使用 `order by`，使用用 `distribute by + sort by`
+	+ 如果 `distribute by` 和 `sort by` 字段是同一个时，此时，`cluster by = distribute by + sort by`
 
-## Hive中sortby/orderby/clusterby/distrbuteby
+#### 参考文档————Hive中排序函数使用方式及区别
+1. [Hive面试题4：讲讲Hive中的排序Sort By、Order By、Cluster By、Distrbute By](https://blog.csdn.net/u012955829/article/details/102847736)  
+2. [【hive】orderby,sortby,distributeby,clusterby作用以及用法](http://blog.sina.com.cn/s/blog_7e04e0d00102xq2l.html)  
 
-
-## Hive中split/coalesce/collect list
-
-
-## Hive有哪些保存元数据的方式
+### 其他待补充说明的函数———— `split` / `coalesce` / `collect list`
 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
