@@ -1,5 +1,4 @@
-# Hive面试宝典
-
+# Hive面试宝典 🕹️v1.0.0
 
 ## Hive的介绍
 ### Hive和Hadoop的关系
@@ -278,6 +277,8 @@ Hive的体系结构可以分为以下几部分
 
 ## Hive内部表、外部表
 ### Hive内部表和外部表的区别是什么
+**待补充**  
+
 **后续处理一下具体内容**  
 1. [Hive内部表和外部表的区别及如何创建](https://blog.csdn.net/qq_39783601/article/details/104934245)  
 2. [Hive表（管理表、外部表）的创建规则](https://www.cnblogs.com/leo-wong/articles/14257995.html)  
@@ -426,6 +427,7 @@ Hive的体系结构可以分为以下几部分
 1. 对`group by`后面所有字段去重，并不能只对一列去重  
 
 ### row_number() over 窗口函数
+**待补充**
 
 **后续处理一下具体内容**  
 1. [一种巧妙的hive sql数据去重方法](https://blog.csdn.net/shuaiqig/article/details/116228534)  
@@ -520,7 +522,10 @@ sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然�
 
 ## Hive数据倾斜
 ### 产生的原因
+**待补充**  
+
 ### 解决的方案
+**待补充**  
 
 **整理一下参考文档**
 1. [hive数据倾斜原因和解决方法](https://blog.csdn.net/u010670689/article/details/42920917)  
