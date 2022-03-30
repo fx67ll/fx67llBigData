@@ -11,7 +11,7 @@
 5. 配置hadoop环境配置，修改JDK地址  
 	+ 先使用下面的方法获取yum安装后的java路径 `/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-1.el7_9.x86_64`  
 	+ `vi /home/hadoop/hadoop-2.6.5/etc/hadoop/hadoop-env.sh`  
-	+ 找到地址那行修改地址 `export JAVA_HOME=../../../usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-1.el7_9.x86_64` 
+	+ 找到地址那行修改地址 `export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-1.el7_9.x86_64` 
 6. 修改hadoop核心配置 `vi /home/hadoop/hadoop-2.6.5/etc/hadoop/core-site.xml`  
 	+ 默认文件进去之后是空的`<configuration></configuration>`  
 	```
@@ -34,7 +34,7 @@
 	```
 7. 修改hdfs核心配置 `vi /home/hadoop/hadoop-2.6.5/etc/hadoop/hdfs-site.xml`  
 	+ 默认文件进去之后是空的`<configuration></configuration>`  
-	+ 注意配置后将`9000、50070、8485`端口全部在防火墙开放一下
+	+ 注意配置后将`9000、50070、8485`端口全部在防火墙开放一下  
 	```
 	<!-- 指定副本数，不能超过机器节点数  -->
 	<property>
