@@ -9,8 +9,8 @@
 
 ### Hive的特点
 1. Hive可以自由的扩展集群的规模，一般情况下不需要重启服务（世界上最大的Hadoop集群在Yahoo!，2009年的规模在4000台节点左右）  
-2. Hive支持用户自定义函数，用户可以根据自己的需求来实现自己的函数  
-3. 良好的容错性，节点出现问题SQL仍可完成执行  
+2. Hive支持用户自定义函数，用户可以根据自己的需求来实现自己的函数（可能会引申自定义函数）  
+3. 良好的容错性，节点出现问题SQL仍可完成执行（可能会拓展数据倾斜相关问题，或者直接问你你工作中有没有遇到这样的问题）  
 
 ### Hive的缺点
 1. Hive的HQL表达能力有限。迭代式算法无法表达；数据挖掘方面不擅长  
@@ -19,10 +19,6 @@
 	+ Hive 在查询数据的时候，由于没有索引，需要扫描整个表，因此延迟较高  
 	+ 另外一个导致 Hive 执行延迟高的因素是 MapReduce框架，由于MapReduce 本身具有较高的延迟，因此在利用MapReduce 执行Hive查询时，也会有较高的延迟  
 	+ 相对的，数据库的执行延迟较低。当然，这个低是有条件的，即数据规模较小，当数据规模大到超过数据库的处理能力的时候，Hive的并行计算显然能体现出优势  
-
-#### 参考资料————Hive介绍
-1. [Hive原理总结](https://www.cnblogs.com/beiyi888/p/9592490.html)  
-2. [Hive简介和架构](https://blog.csdn.net/student__software/article/details/81584448)  
 
 
 ## Hive的架构
@@ -566,7 +562,11 @@ where (select count(1) as num from A where A.ID = B.ID) = 0
 1. [Hive面试题4：讲讲Hive中的排序Sort By、Order By、Cluster By、Distrbute By](https://blog.csdn.net/u012955829/article/details/102847736)  
 2. [【hive】orderby,sortby,distributeby,clusterby作用以及用法](http://blog.sina.com.cn/s/blog_7e04e0d00102xq2l.html)  
 
-### 其他待补充说明的函数———— `split` / `coalesce` / `collect list`
+### 其他待补充说明的函数———— `split` / `coalesce` / `collect list`  
+
+
+#### 待处理参考文档
+1. [处理下实战总结那三个部分](https://www.cnblogs.com/beiyi888/p/9592490.html)  
 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
