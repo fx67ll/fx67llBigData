@@ -58,17 +58,19 @@ HDFS
 	+ 其中最常用的是 CLI shell 命令行，CLI 启动的时候，会同时启动一个Hive副本  
 	+ WUI 是通过浏览器访问 Hive，默认端口是***9999***  
 	+ Client 是Hive的客户端，，在启动 Client模式 的时候，需要指出 Hive Server 所在节点，并且在该节点启动 Hive Server  
+	+ JDBC/ODBC用 JAVA 实现，与传统数据库 JDBC 类似  
 2. 元数据存储：通常是存储在关系数据库如 mysql , derby中  
 	+ Hive中的元数据包括表的名字，表的列和分区及其属性，表的属性（是否为外部表等），表的数据所在目录等  
-	+ JDBC/ODBC用 JAVA 实现，与传统数据库 JDBC 类似
 3. 解释器、编译器、优化器、执行器  
 	+ 解释器、编译器、优化器完成 HQL 查询语句从词法分析、语法分析、编译、优化以及查询计划的生成  
 	+ 生成的查询计划存储在 HDFS 中，并在随后有 MapReduce 调用执行（注意！！！包含*的查询，比如select * from tbl不会生成MapRedcue任务）  
-	+ ===============================================================
+	+ ===============================================================  
 	+ 解析器（parser）：将查询字符串转化为解析树表达式  
-	+ 编译器（physical plan）：分为`语义分析器（semantic analyzer）`和 `逻辑策略生成器（logical plan generator）`，
-		语义分析器（semantic analyzer）：将解析树表达式转换为基于块（block-based）的内部查询表达式，
-		逻辑策略生成器（logical plan generator）：将内部查询表达式转换为逻辑策略，这些策略由逻辑操作树组成  
+	+ ===============================================================
+	+ 编译器（physical plan）：分为`语义分析器（semantic analyzer）`和 `逻辑策略生成器（logical plan generator）`  
+	+ 语义分析器（semantic analyzer）：将解析树表达式转换为基于块（block-based）的内部查询表达式  
+	+ 逻辑策略生成器（logical plan generator）：将内部查询表达式转换为逻辑策略，这些策略由逻辑操作树组成  
+	+ ===============================================================
 	+ 优化器（optimizer）：通过逻辑策略构造多途径并以不同方式重写  
 
 
@@ -123,8 +125,8 @@ HDFS
 
 ### Hive的隐式类型转换规则
 1. 任何整数类型都可以隐式地转换为一个范围更广的类型，如 tinyint 可以转换成 int，int 可以转换成 bigint  
-2. 所有整数类型、flaot 和 string 类型都可以隐式地转换成 double  
-3. tinyint、smallint、int 都可以转换为 flaot  
+2. 所有整数类型、float 和 string 类型都可以隐式地转换成 double  
+3. tinyint、smallint、int 都可以转换为 float  
 4. boolean 类型不可以转换为任何其它的类型  
 
 ### Hive数据存储所使用的文件格式  
@@ -161,11 +163,11 @@ HDFS
 	+ 能够很好的压缩，同时减少大量的表扫描和反序列化的时间，有很好的查询性能，支持有限的模式演进，但是写速度通常比较慢  
 	+ Parquet文件是以二进制方式存储的，所以是不可以直接读取的，文件中包括该文件的数据和元数据，因此Parquet格式文件是自解析的  
 6. 总结
-	+ TextFile 存储空间消耗比较大，并且压缩的text 无法分割和合并 查询的效率最低,可以直接存储，加载数据的速度最高  
-	+ SequenceFile 存储空间消耗最大,压缩的文件可以分割和合并 查询效率高，需要通过text文件转化来加载  
-	+ ORCFile/RCFile 存储空间最小，查询的效率最高 ，需要通过text文件转化来加载，加载的速度最低  
-	+ Parquet 格式是列式存储，有很好的压缩性能和表扫描功能  
-	+ SequenceFile/ORCFile/RCFile格式的表不能直接从本地文件导入数据，数据要先导入到TextFile格式的表中，然后再从TextFile表中导入到SequenceFile/ORCFile/RCFile表中  
+	+ TextFile 存储空间消耗比较大，并且压缩的text无法分割和合并查询的效率最低，可以直接存储，加载数据的速度最高  
+	+ SequenceFile 存储空间消耗最大，压缩的文件可以分割和合并，查询效率高  
+	+ ORCFile / RCFile 存储空间最小，查询的效率最高，加载的速度最低  
+	+ SequenceFile / ORCFile / RCFile 格式的表不能直接从本地文件导入数据，数据要先导入到TextFile格式的表中，
+		然后再从TextFile表中导入到SequenceFile/ORCFile/RCFile表中  
 
 ### Hive中使用的压缩算法
 1. 我们原始数据使用的是LZO的压缩格式，因为原始数据比较大，所以选择了支持切割的LZO压缩  
