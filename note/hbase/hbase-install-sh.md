@@ -97,3 +97,8 @@
 
 #### HMaster进程几秒后消失，查看日志发现必须再主节点active的时候启动，备用主节点active没用  
 [解决方案](https://blog.csdn.net/yxf19034516/article/details/105736372)  
+
+
+我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
+如果您喜欢这篇文章，欢迎访问我的 [本文github仓库地址](https://github.com/fx67ll/fx67llBigData/blob/main/note/hbase/hbase-install-sh.md)，为我点一颗Star，Thanks~ :)  
+***转发请注明参考文章地址，非常感谢！！！***
