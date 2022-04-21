@@ -63,7 +63,7 @@ object Spark01_WordCount {
 
 ## 一些概念
 ### 运行模式（如何连接到spark集群）：本地模式，standalone模式，yarn模式（工作中），k8s容器模式，windows模式  
-![Spark运行模式](spark-use_files/Spark运行模式.png)
+![Spark运行模式](spark-quickstart_files/Spark运行模式.png)
 ### 提交应用程序：以及提交时候所用到参数--执行的主类，部署模式，运行类所在的jar包，当前应用的任务参数  
 ### 配置历史服务：如果spark服务挂了，之前的任务就看不到了，所以需要使用历史服务  
 ### 配置高可用：解决单点故障，双master，一般都用zookeeper配置，高可用又叫HA  
@@ -97,7 +97,7 @@ object Spark01_WordCount {
 它是Spark中最重要的一个概念，是弹性分布式数据集，是一种容错的、可以被并行操作的元素集合，是Spark对所有数据处理的一种基本抽象。
 #### 类比土豆薯片理解RDD  
 [参考文档————【Spark Core】【RDD】【01】核心属性 & 执行原理](https://blog.csdn.net/weixin_43589563/article/details/121412814)  
-![类比土豆薯片理解](spark-use_files/类比土豆薯片理解.png)  
+![类比土豆薯片理解](spark-quickstart_files/类比土豆薯片理解.png)  
 ```
 刚从地里挖出来的土豆食材、清洗过后的干净土豆、生薯片、烤熟的薯片，流水线上这些食材的不同形态，就像是 Spark 中 RDD 对于不同数据集合的抽象。
 RDD 具有 4 大属性，分别是 partitions、partitioner、dependencies 和 compute 属性。正因为有了这 4 大属性的存在，让 RDD 具有分布式和容错性这两大最突出的特性。
