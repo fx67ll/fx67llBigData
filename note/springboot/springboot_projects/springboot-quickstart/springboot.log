@@ -1,0 +1,18 @@
+2022-04-22 16:21:37.942 debug 12584 --- [main] com.fx67ll.springboot.Starter            : Starting Starter on LAPTOP-RJUCICJM with PID 12584 (C:\Users\fx67ll\Desktop\springboot-quickstart\target\classes started by fx67ll in C:\Users\fx67ll\Desktop\springboot-quickstart)
+2022-04-22 16:21:37.942 debug 12584 --- [main] com.fx67ll.springboot.Starter            : No active profile set, falling back to default profiles: default
+2022-04-22 16:21:38.673 debug 12584 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 9897 (http)
+2022-04-22 16:21:38.673 debug 12584 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-04-22 16:21:38.673 debug 12584 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.29]
+2022-04-22 16:21:38.689 debug 12584 --- [main] o.a.catalina.core.AprLifecycleListener   : An older version [1.2.16] of the APR based Apache Tomcat Native library is installed, while Tomcat recommends a minimum version of [1.2.23]
+2022-04-22 16:21:38.689 debug 12584 --- [main] o.a.catalina.core.AprLifecycleListener   : Loaded APR based Apache Tomcat Native library [1.2.16] using APR version [1.6.3].
+2022-04-22 16:21:38.689 debug 12584 --- [main] o.a.catalina.core.AprLifecycleListener   : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2022-04-22 16:21:38.689 debug 12584 --- [main] o.a.catalina.core.AprLifecycleListener   : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2022-04-22 16:21:39.707 debug 12584 --- [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 1.0.2m  2 Nov 2017]
+2022-04-22 16:21:39.791 debug 12584 --- [main] o.a.c.c.C.[.[localhost].[/fx67llpr]      : Initializing Spring embedded WebApplicationContext
+2022-04-22 16:21:39.791 debug 12584 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 1811 ms
+2022-04-22 16:21:39.907 debug 12584 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2022-04-22 16:21:39.992 debug 12584 --- [main] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates or check your Thymeleaf configuration)
+2022-04-22 16:21:40.061 debug 12584 --- [main] o.s.b.a.f.FreeMarkerAutoConfiguration    : Cannot find template location(s): [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.checkTemplateLocation=false)
+2022-04-22 16:21:40.108 debug 12584 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 9897 (http) with context path '/fx67llpr'
+2022-04-22 16:21:40.108 debug 12584 --- [main] com.fx67ll.springboot.Starter            : Started Starter in 2.623 seconds (JVM running for 3.569)
+2022-04-22 16:34:02.068 debug 12584 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
