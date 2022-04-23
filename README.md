@@ -9,8 +9,20 @@ everything about bigdata
 |  :----:  |  :----:  |  :----:  |  :----:  |
 |  面试总结  |  技术博文（速攻）  |  项目总结  |  sql练习  |
 
+## 0.2.8.2022044
+* SpringBoot快速入门 `v0.3.0` **推进**  
+	> 待完成后填写
+* springboot-mybatis-crud-prod 生产环境示例项目 `v` **  
+
+## 0.2.7.20220423
+* SpringBoot快速入门 `v0.2.0` **推进**  
+	> mvc，crud，swagger2，热部署，单元测试
+* springboot-mybatis 整合mybatis示例项目 `v1.0.0` ***完成***  
+* springboot-mybatis-crud 整合mybatis并完成全套crud示例项目 `v1.0.0` ***完成***
+
 ## 0.2.6.20220422
 * SpringBoot快速入门 `v0.1.0` *开始推进*  
+	> 注解，核心配置，打包，部署
 * springboot-quickstart示例项目 `v1.0.0` ***完成***  
 
 ## 0.2.5.20220421

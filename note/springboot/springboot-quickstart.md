@@ -1,4 +1,4 @@
-# SpringBoot快速入门 🕹️0.1.0  
+# SpringBoot快速入门 🕹️0.3.0  
 
 
 ## 使用xml还是注解
@@ -36,7 +36,23 @@
 个性化的定义自己所需要的功能并声明一个注解，简化工程，可以参考文章————[SPRINGBOOT自定义注解](https://www.cnblogs.com/mizhiniurou/p/10890951.html)学习  
 
 ### 常用注解
-可以参考文章————[SpringBoot常用注解集合](https://blog.csdn.net/qq_53324833/article/details/121079368)学习  
+**可以参考文章————[SpringBoot常用注解集合](https://blog.csdn.net/qq_53324833/article/details/121079368)详细学习，这里后期会补上说明**  
+#### @RestController、@ResponseBody、@RequestBody
+1. 相当于`@Controller + @ResponseBody`两个注解的结合，返回`JSON`数据不需要在方法前面加`@ResponseBody`注解了，
+	但使用@RestController这个注解，就不能返回jsp、html页面，视图解析器无法解析jsp、html页面v
+2. `@ResponseBody`表示该方法的返回结果直接写入`HTTP response body`中，一般在异步获取数据时使用（也就是AJAX），
+	在使用`@RequestMapping`后，返回值通常解析为跳转路径，但是加上`@ResponseBody`后返回结果不会被解析为跳转路径，而是直接写入`HTTP response body`中，
+	比如异步获取`JSON`数据，加上`@ResponseBody`后，会直接返回`JSON`数据  
+3. `@RequestBody`将 HTTP 请求正文插入方法中，使用适合的 HttpMessageConverter 将请求体写入某个对象  
+#### @MapperScan、@Mapper
+1. @Mapper注解：
+	+ 作用：在接口类上添加了@Mapper，在编译之后会生成相应的接口实现类  
+	+ 添加位置：接口类上面  
+	+ 如果想要每个接口都要变成实现类，那么需要在每个接口类上加上`@Mapper`注解，比较麻烦，解决这个问题用`@MapperScan`注解
+2. @MapperScan注解：
+	+ 作用：指定要变成实现类的接口所在的包，然后包下面的所有接口在编译之后都会生成相应的实现类  
+	+ 添加位置：是在Springboot启动类上面添加  
+	+ 添加`@MapperScan("com.winter.da")`注解以后，`com.winter.dao`包下面的接口类，在编译之后都会生成相应的实现类  
 
 
 ## 习惯大于配置目标
@@ -183,12 +199,364 @@ spring:
 7. 部署并访问
 	+ 放置到外部tomcat中，执行bin目录下start脚本即可  
 
+### 热部署
+热部署，就是在应用正在运行的时候升级软件，却不需要重新启动应用  
+#### 热部署原理
+1. `spring-boot-devtools`是一个为开发者服务的一个模块，其中最重要的功能就是自动应用代码更改到最新的App上面去，
+	原理是在发现代码有更改之后，重新启动应用，但是速度比手动停止后再启动还要更快，更快指的不是节省出来的手工操作的时间  
+2. 其深层原理是使用了两个`ClassLoader`，一个`Classloader`加载那些不会改变的类（第三方Jar包），另一个`ClassLoader`加载会更改的类，称为`restart ClassLoader`，
+	这样在有代码更改的时候，原来的`restart ClassLoader`被丢弃，重新创建一个`restart ClassLoader`，由于需要加载的类相比较少，所以实现了较快的重启时间，*大概在5秒以内*  
+#### devtools原理
+1. devtools会监听classpath下的文件变动，并且会立即重启应用（发生在保存时机）*注意：因为其采用的虚拟机机制，该项重启是很快的*  
+2. devtools可以实现页面热部署（即页面修改后会立即生效，这个可以直接在`application`文件中配置`spring.thymeleaf.cache=false`来实现 *注意：不同的模板配置不一样*
+#### 热部署主要步骤
+1. 在`pom.xml`中添加依赖，同时添加`devtools`生效标志插件  
+	```
+	<!--热部署插件devtools-->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-devtools</artifactId>
+		<!--表示当前这个项目被继承之后，这个不向下传递-->
+		<optional>true</optional>
+	</dependency>
+	
+	<plugin>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-maven-plugin</artifactId>
+		<!--在原有的基础上添加-->
+		<configuration>
+			<!--如果没有该配置，热部署插件devtools不生效-->
+			<fork>true</fork>
+		</configuration>
+	</plugin>
+	```
+2. 修改`application.yml`全局配置文件，在`application.yml`中配置`spring.devtools.restart.enable=false`，此时`restart`类加载器还会初始化，但不会监视文件更新
+	```
+	spring:
+	  # 热部署配置
+	  devtools:
+		restart:
+		  enabled: true
+		  # 设置重启的目录，添加目录的文件需要restart
+		  additional-paths: src/main/java
+		  # 解决项目启动重新编译后接口报404的问题
+		  poll-interval: 3000
+		  quiet-period: 1000
+	```
+3. 修改 IDEA 配置
+	+ 修改了java类之后，IDEA 默认是不自动编译的，而`spring-boot-devtools`又是监测`classpath`下的文件发生变化才会重启应用，所以需要设置 IDEA 的自动编译  
+	+ 设置自动配置 `File -> Settings -> Build -> Complier -> Build Project automatically`  
+	+ ~~修改`Register`属性，执行快捷键`ctrl + shift + alt + /`，选择`Register`，勾上`Complier autoMake allow when app running`~~  
+	+ *注意 IDEA 2021.2.3 版本中没有上面的选项*，迁移到了`File -> Settings -> Tools -> Advanced Settings -> Complier -> Allow auto-make to start......`
+4. 配置完需要重启一下，然后有修改的话项目会自动更新，但是如果是自动触发的话，会造成频繁更新，对硬件有一定的负担，所以可以改成手动触发模式
+	+ 点击右上角 `Run/Debug Configurations`  
+	+ 选择下拉 `Configuration -> Spring Boot -> Running Application Update Policies -> On 'Update' action`  
+	+ 选择 `Update classes and resources`  
+	+ 如果有更新可以，使用快捷键 `Ctrl + F10` 重新编译  
 
-[参考教程 ———— 两天搞定SpringBoot框架](https://www.bilibili.com/video/BV16i4y197zh)  
-[参考文档 ———— JavaSpringBoot 中 @Autowired用法](https://blog.csdn.net/weixin_41290863/article/details/111568023)  
-[参考文档 ———— SpringBoot - @Configuration、@Bean注解的使用详解（配置类的实现）](https://www.hangge.com/blog/cache/detail_2506.html)  
-[参考文档 ———— 【Spring Boot】Spring基础 —— 组合注解与元注解](https://blog.csdn.net/the_ZED/article/details/105456946)  
 
+## 单元测试
+### Service业务层————业务逻辑方法测试
+*需要注意的是：*
+1. 如果在和`main文件夹`平级的`test文件夹`下新建了`java文件夹`，但是无法新建`java class`文件
+2. 那么就需要右键文件夹 `Mark Directory as -> Test Sources Root`之后，文件夹变绿即可  
+```
+# 示例代码
+package com.fx67ll.springboot.service;
+
+import com.fx67ll.springboot.Starter;
+import com.fx67ll.springboot.po.User;
+import com.fx67ll.springboot.query.UserQuery;
+import com.fx67ll.springboot.srevice.UserService;
+import com.github.pagehelper.PageInfo;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import javax.annotation.Resource;
+
+/**
+ * Service业务方法测试
+ *
+ * Junit中的RunWith注解 表示该类是单元测试的执行类
+ * SpringRunner 是 spring-test 提供的测试执行单元类（是Spring单元测试中SpringJUnit4ClassRunner的新名字）
+ * SpringBootTest注解 是执行测试程序的引导类
+ */
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {Starter.class})
+public class TestUserService {
+
+    // 日志的使用
+    private Logger logger = LoggerFactory.getLogger(TestUserService.class);
+
+    @Resource
+    private UserService userService;
+
+    @Before
+    public void before() {
+        logger.info("单元测试开始......");
+    }
+
+    @Test
+    public void testQueryUserById() {
+        logger.info("测试根据用户id查询......");
+
+        User user = userService.queryUserById(1);
+        logger.info("用户记录: {}", user.toString());
+    }
+
+    @Test
+    public void testSelectUserListByParams() {
+        logger.info("测试根据分页条件查询用户列表......");
+
+        UserQuery userQuery = new UserQuery();
+        PageInfo<User> pageInfo = userService.selectUserListByParams(userQuery);
+        logger.info(pageInfo.toString());
+    }
+
+    @After
+    public void after() {
+        logger.info("单元测试结束......");
+    }
+}
+```
+
+### controller控制层————接口方法测试
+#### 使用MockMVC进行测试
+`MockMvc`是由`spring-test`包提供，实现了对`Http请求`的模拟，能够直接使用网络的形式，转换到`Controller`的调用，使得测试速度快、不依赖网络环境。
+同时提供了一套验证的工具，结果的验证十分方便  
+#### 什么是Mock
+在面向对象的程序设计中，模拟对象`mock object`是以可控的方式模拟真实对象行为的假对象。
+在编程过程中，通常通过模拟一些输入数据，来验证程序是否达到预期结果  
+#### 接口MockMvcBuilder
+提供一个唯一的`build方法`，用来构造`MockMvc`。
+主要有两个实现：`StandaloneMockMvcBuilder`和`DefaultMockMvcBuilder`，分别对应两种测试方式，
+即独立安装和集成Web环境测试（并不会集成真正的`web环境`，而是通过相应的`Mock API`进行模拟测试，无须启动服务器）。
+MockMvcBuilders提供了对应的创建方法`standaloneSetup`方法和`webAppContextSetup`方法，在使用时直接调用即可。
+```
+# 示例代码
+# PS：虽然提示测试通过，但是控制台一直没有打印出返回信息的记录，后期有空看看
+package com.fx67ll.springboot.controller;
+
+import com.fx67ll.springboot.Starter;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {Starter.class})
+@AutoConfigureMockMvc
+public class TestUserController {
+
+    // 日志的使用
+    private Logger logger = LoggerFactory.getLogger(TestUserController.class);
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    /**
+     * 模拟测试用户列表查询
+     * 其实就在模拟真实环境下前端对后端发起的请求
+     */
+    @Test
+    public void apiTestSelectUserListByParams() throws Exception {
+
+        logger.info("开始模拟发送查询用户列表的请求......");
+
+        // 构建请求
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/user/list")
+                .contentType("text/html") // 设置请求头信息
+                .accept(MediaType.APPLICATION_JSON); // 设置请求Accept头信息
+
+        // 发送请求
+        ResultActions perform = mockMvc.perform(requestBuilder);
+
+        // 校验请求结果
+        perform.andExpect(MockMvcResultMatchers.status().isOk());
+
+        // 获取执行完成后返回的结果
+        MvcResult mvcResult = perform.andReturn();
+
+        // 得到执行后的响应
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        // 打印结果
+        logger.info(String.valueOf(response.getContentLength()));
+        logger.info("响应状态: ", response.getStatus());
+        logger.info("响应信息: ", response.getContentAsString());
+
+        logger.info("结束模拟发送查询用户列表的请求......");
+    }
+
+    @Test
+    public void apiTestQueryUserByUsername() throws Exception {
+
+        logger.info("开始模拟根据用户名查询用户记录的请求......");
+
+        // 构建请求并发送
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/user/name/admin"))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        // 打印结果
+        logger.info("响应状态: ", mvcResult.getResponse().getStatus());
+        logger.info("响应信息: ", mvcResult.getResponse().getContentAsString());
+
+        logger.info("结束模拟根据用户名查询用户记录的请求......");
+    }
+}
+```
+
+
+## MVC
+### 什么是MVC
+1. MVC三层架构是指：视图层 View、服务层 Service，与持久层 Dao，它们分别完成不同的功能  
+	+ View 层：用于接收用户提交请求的代码在这里编写  
+	+ Service 层：系统的业务逻辑主要在这里完成  
+	+ Dao 层：直接操作数据库的代码在这里编写  
+2. 为了更好的降低各层间的耦合度，在三层架构程序设计中，采用面向抽象编程，即上层对下层的调用，是通过接口实现的，而下层对上层的真正服务提供者，是下层接口的实现类  
+3. 服务标准（接口）是相同的，服务提供者（实现类）可以更换，这就实现了层间解耦合  
+
+### MVC 架构程序的工作流程
+1. 用户通过 View 页面向服务端提出请求，可以是表单请求、超链接请求、AJAX 请求等  
+2. 服务端 Controller 控制器接收到请求后对请求进行解析，找到相应的 Model 对用户请求进行处理  
+3. Model 处理后，将处理结果再交给 Controller  
+4. Controller 在接到处理结果后，根据处理结果找到要作为向客户端发回的响应 View 页面，页面经渲染（数据填充）后，再发送给客户端  
+
+
+## Swagger2文档工具
+### 依赖
+在`pom.xml`中添加以下代码
+```
+<dependency>
+	<groupId>io.springfox</groupId>
+	<artifactId>springfox-swagger2</artifactId>
+	<version>2.9.2</version>
+</dependency>
+<dependency>
+	<groupId>io.springfox</groupId>
+	<artifactId>springfox-swagger-ui</artifactId>
+	<version>2.9.2</version>
+</dependency>
+```
+
+### 常用注解
+**可以参考文章————[swagger2 注解说明](https://blog.csdn.net/xiaojin21cen/article/details/78654652)详细学习，这里后期会补上说明**  
+#### @Api
+*主要是用在请求类上，用于说明该类的作用*
+```
+# 示例
+@Api(tags = "xx模块")
+```
+#### @ApiOperation
+*主要是用在请求的方法上，说明方法的作用*
+```
+# 示例
+@ApiOperation(value = "xx方法的作用", notes = "xx方法的备注说明")
+```
+#### @ApiImplicitParams、@ApiImplicitParam
+*主要是用在请求的方法上，说明方法的参数*
+```
+# 详细参数说明
+@ApiImplicitParams：用在请求的方法上，包含一组参数说明
+	@ApiImplicitParam：对单个参数的说明	    
+	    name：参数名
+	    value：参数的说明、描述
+	    required：参数是否必须必填
+	    paramType：参数放在哪个地方
+	        · query --> 请求参数的获取：@RequestParam
+	        · header --> 请求参数的获取：@RequestHeader	      
+	        · path（用于restful接口）--> 请求参数的获取：@PathVariable
+	        · body（请求体）-->  @RequestBody User user
+	        · form（普通表单提交）	   
+	    dataType：参数类型，默认String，其它值dataType="Integer"	   
+	    defaultValue：参数的默认值
+	
+# 单个参数示例	
+@ApiImplicitParam(name = "xxx", value = "xxx", required = true, paramType = "path", dataType = "String", defaultValue = "")
+
+# 多个参数示例
+@ApiImplicitParams({
+	@ApiImplicitParam(name = "xxxa", value = "xxxa", required = true, paramType = "body", dataType = "String", defaultValue = ""),
+	@ApiImplicitParam(name = "xxxb", value = "xxxb", required = true, paramType = "body", dataType = "String", defaultValue = ""),
+})
+```
+#### @ApiResponses、@ApiResponse
+*主要是用在请求的方法上，说明错误响应的信息*
+```
+# 详细参数说明
+@ApiResponses：响应状态的说明。是个数组，可包含多个 @ApiResponse
+	@ApiResponse：每个参数的说明
+	    code：数字，例如400
+	    message：信息，例如"请求参数没填好"
+	    response：抛出异常的类
+	
+# 多个参数示例，一般响应都是多个code，所以不写单个参数的示例了
+@ApiResponses({
+		@ApiResponse(code = 200, message = "请求成功"),
+		@ApiResponse(code = 578, message = "请求参数错误"),
+		@ApiResponse(code = 404, message = "请求路径没有或页面跳转路径不对")
+})
+
+```
+#### @ApiModel、@ApiModelProperty 
+1. @ApiModel 经常用于请求的入参对象和响应返回值对象的描述  
+	+ 入参是对象，即 @RequestBody 时， 用于封装请求（包括数据的各种校验）数据  
+	+ 返回值是对象，即 @ResponseBody 时，用于返回值对象的描述  
+2. @ApiModelProperty 用于每个属性上面，说明属性的含义
+```
+# 示例
+@ApiModel(description = "用户实体类")
+public class User {
+    @ApiModelProperty(value = "用户名", required = true, example = "0")
+    private Integer id;
+    
+	@ApiModelProperty(value = "用户ID", required = true, example = "fx67ll")
+    private String userName;
+    
+	@ApiModelProperty(value = "用户密码", required = true, example = "xxxxxxxx")
+    private String userPwd;
+}
+```
+
+
+## 附录
+### 操作代码目录说明
+|  springboot-quickstart  |  springboot-mybatis  |  springboot-crud  |
+|  :----:  |  :----:  |  :----:  |
+|  快速入门  |  整合mybatis  |  整套crud操作  |
+
+### 参考资料
+1. [参考教程 ———— 两天搞定SpringBoot框架](https://www.bilibili.com/video/BV16i4y197zh)  
+2. [参考文档 ———— JavaSpringBoot 中 @Autowired用法](https://blog.csdn.net/weixin_41290863/article/details/111568023)  
+3. [参考文档 ———— SpringBoot - @Configuration、@Bean注解的使用详解（配置类的实现）](https://www.hangge.com/blog/cache/detail_2506.html)  
+4. [参考文档 ———— 【Spring Boot】Spring基础 —— 组合注解与元注解](https://blog.csdn.net/the_ZED/article/details/105456946)  
+5. [参考文档 ———— @RestController 和 @Controller 的区别](https://blog.csdn.net/nimoyaoww/article/details/82999057)  
+6. [参考文档 ———— MapperScan注解详解](https://blog.csdn.net/weixin_44093802/article/details/115601973)  
+7. [参考文档 ———— Mapper.xml详解](https://blog.csdn.net/qq_36850813/article/details/80037363)  
+8. [参考文档 ———— MVC三层架构（详解）](https://blog.csdn.net/qq_48508278/article/details/122648284)  
+9. [参考文档 ———— 配置devtools热部署](https://www.cnblogs.com/charlottepl/p/14694865.html)  
+10. [参考文档 ———— (十三)SpringBoot2.0热部署Devtools原理](https://blog.csdn.net/IT_hejinrong/article/details/89155308)  
+11. [参考文档 ———— 2021版IDEA没有compiler.automake.allow.when.app.running](https://blog.csdn.net/qq_52978553/article/details/122376118)  
+12. [参考文档 ———— SpringBoot基础之MockMvc单元测试](https://blog.csdn.net/wo541075754/article/details/88983708)  
+ 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
 如果您喜欢这篇文章，欢迎访问我的 [本文github仓库地址](https://github.com/fx67ll/fx67llBigData/blob/main/note/springboot/springboot-quickstart.md)，为我点一颗Star，Thanks~ :)  
