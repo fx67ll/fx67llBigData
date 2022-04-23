@@ -1,0 +1,39 @@
+# http://localhost:7777/fx67ll_springboot_mybatis_crud
+# http://localhost:7777/fx67ll_springboot_mybatis_crud/swagger-ui.html
+server:
+  # 设置项目启动的端口号
+  port: 7777
+  # 设置项目访问路径（上下文路径）
+  servlet:
+    context-path: /fx67ll_springboot_mybatis_crud
+
+# spring 配置，要注意对齐位置，之前spring的配置位置不对导致无法访问到url属性
+spring:
+  # 数据源配置，注意不要上传地址账号密码到github
+  datasource:
+    type: com.mchange.v2.c3p0.ComboPooledDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/sbmb?useUnicode=true&charcterEncoding=utf8
+    username: root
+    password: root
+
+# mybatis 配置
+mybatis:
+  mapper-locations: classpath:/mappers/*.xml
+  type-aliases-package: com.fx67ll.springboot.po
+  configuration:
+    # 下划线转驼峰配置
+    map-underscore-to-camel-case: true
+
+# pagehelper 配置
+pagehelper:
+  helper-dialect: mysql
+
+# 日志配置
+logging:
+  level:
+    com:
+      fx67ll:
+        springboot-mybatis:
+          # 显示dao，执行sql语句
+          dao: debug
