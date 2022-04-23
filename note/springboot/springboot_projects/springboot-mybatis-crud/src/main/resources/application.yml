@@ -34,6 +34,6 @@ logging:
   level:
     com:
       fx67ll:
-        springboot-mybatis:
+        springboot:
           # 显示dao，执行sql语句
           dao: debug
