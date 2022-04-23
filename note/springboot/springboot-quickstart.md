@@ -253,9 +253,20 @@ spring:
 	+ 选择下拉 `Configuration -> Spring Boot -> Running Application Update Policies -> On 'Update' action`  
 	+ 选择 `Update classes and resources`  
 	+ 如果有更新可以，使用快捷键 `Ctrl + F10` 重新编译  
+5. 快捷键`Ctrl + F9`，使用热部署重新启动  
 
 
 ## 单元测试
+### 依赖
+```
+<!--单元测试-->
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-test</artifactId>
+	<scope>test</scope>
+</dependency>
+```
+
 ### Service业务层————业务逻辑方法测试
 *需要注意的是：*
 1. 如果在和`main文件夹`平级的`test文件夹`下新建了`java文件夹`，但是无法新建`java class`文件
@@ -537,6 +548,126 @@ public class User {
 ```
 
 
+## 分布式缓存工具Ehcache整合
+### 什么是Ehcache
+`EhCache`是一个`纯Java`的进程内缓存框架，具有快速、精干等特点，是`Hibernate`中默认`CacheProvider`。  
+`Ehcache`是一种广泛使用的开源`Java分布式缓存`，主要面向通用缓存，`Java EE`和`轻量级容器`。  
+它具有内存和磁盘存储，缓存加载器，缓存扩展，缓存异常处理程序，一个`gzip`缓存`servlet`过滤器，支持`REST API`和`SOAP API`等特点。  
+
+### SpringCache相关注解
+SpringBoot缓存实现内部使用SpringCache实现缓存控制，这里集成Ehcache实际上是对SpringCache抽象的一种实现
+**可以参考文章————[Spring Cache 简介](https://www.jianshu.com/p/9d3c58ecf8ff)详细学习，这里后期会补上说明**  
+#### @EnableCaching
+开启缓存功能，一般放在启动类上  
+#### @CacheConfig
+当我们需要缓存的地方越来越多，你可以使用`@CacheConfig(cacheNames = {"cacheName"})`注解在`Class`之上来统一指定`value`的值，
+这时可省略`value`，如果你在你的方法依旧写上了`value`，那么依然以方法的`value`值为准  
+#### @Cacheable
+根据方法对其返回结果进行缓存，下次请求时，如果缓存存在，则直接读取缓存数据返回；如果缓存不存在，则执行方法，并把返回的结果存入缓存中，一般用在查询方法上  
+*注意`value`后面要使用`ehcache.xml`文件中所列的`cache.name`*
+```
+# 单个参数示例代码
+@Cacheable(value = "fx67llCache", key = "#xxx")
+
+# 多个参数示例，采用拼接的方式
+@Cacheable(value = "fx67llCache", key = "#xxx.xxx + '-' + #xxx.xxx + '-' + #xxx.xxx")
+```
+#### @CachePut
+使用该注解标志的方法，每次都会执行，并将结果存入指定的缓存中。其他方法可以直接从响应的缓存中读取缓存数据，而不需要再去查询数据库，一般用在新增方法上  
+```
+# 示例代码
+@CachePut(value = "fx67llCache", key = "#xxx.xxx")
+```
+#### @CacheEvict
+使用该注解标志的方法，会清空指定的缓存，一般用在更新或者删除方法上  
+```
+# 示例代码
+@CacheEvict(value = "fx67llCache", key = "#xxx")
+```
+#### @Caching
+该注解可以实现同一个方法上同时使用多种注解  
+
+### Ehcache的使用
+1. 在`pom.xml`添加依赖
+	```
+	<!--Ehcache工具依赖-->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-cache</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>net.sf.ehcache</groupId>
+		<artifactId>ehcache</artifactId>
+	</dependency>
+	```
+2. 添加`ehcache.xml`文件
+	```
+	<?xml version="1.0" encoding="UTF-8"?>
+	<ehcache name="fx67llCache">
+		<!--
+		   diskStore：为缓存路径，ehcache分为内存和磁盘两级，此属性定义磁盘的缓存位置。参数解释如下：
+		   user.home – 用户主目录
+		   user.dir  – 用户当前工作目录
+		   java.io.tmpdir – 默认临时文件路径
+		 -->
+		<diskStore path="D:\Java\test-ehcache-cache"/>
+
+		<!--
+		   defaultCache：默认缓存策略，当ehcache找不到定义的缓存时，则使用这个缓存策略。只能定义一个。
+		 -->
+
+		<!--
+		  name:缓存名称。
+		  maxElementsInMemory:缓存最大数目
+		  maxElementsOnDisk：硬盘最大缓存个数。
+		  eternal:对象是否永久有效，一但设置了，timeout将不起作用。
+		  overflowToDisk:是否保存到磁盘，当系统当机时
+		  timeToIdleSeconds:设置对象在失效前的允许闲置时间（单位：秒）。仅当eternal=false对象不是永久有效时使用，可选属性，默认值是0，也就是可闲置时间无穷大。
+		  timeToLiveSeconds:设置对象在失效前允许存活时间（单位：秒）。最大时间介于创建时间和失效时间之间。仅当eternal=false对象不是永久有效时使用，默认是0.，也就是对象存活时间无穷大。
+		  diskPersistent：是否缓存虚拟机重启期数据 Whether the disk store persists between restarts of the Virtual Machine. The default value is false.
+		  diskSpoolBufferSizeMB：这个参数设置DiskStore（磁盘缓存）的缓存区大小。默认是30MB。每个Cache都应该有自己的一个缓冲区。
+		  diskExpiryThreadIntervalSeconds：磁盘失效线程运行时间间隔，默认是120秒。
+		  memoryStoreEvictionPolicy：当达到maxElementsInMemory限制时，Ehcache将会根据指定的策略去清理内存。默认策略是LRU（最近最少使用）。你可以设置为FIFO（先进先出）或是LFU（较少使用）。
+		  clearOnFlush：内存数量最大时是否清除。
+		  memoryStoreEvictionPolicy:可选策略有：LRU（最近最少使用，默认策略）、FIFO（先进先出）、LFU（最少访问次数）。
+			   FIFO，first in first out，这个是大家最熟的，先进先出。
+			   LFU， Less Frequently Used，就是上面例子中使用的策略，直白一点就是讲一直以来最少被使用的。如上面所讲，缓存的元素有一个hit属性，hit值最小的将会被清出缓存。
+			   LRU，Least Recently Used，最近最少使用的，缓存的元素有一个时间戳，当缓存容量满了，而又需要腾出地方来缓存新的元素的时候，那么现有缓存元素中时间戳离当前时间最远的元素将被清出缓存。
+	   -->
+		<defaultCache
+				maxElementsInMemory="10000"
+				eternal="false"
+				timeToIdleSeconds="120"
+				timeToLiveSeconds="120"
+				maxElementsOnDisk="10000000"
+				diskExpiryThreadIntervalSeconds="120"
+				memoryStoreEvictionPolicy="LRU"/>
+
+		<cache
+				name="fx67llCache"
+				eternal="false"
+				maxElementsInMemory="100"
+				overflowToDisk="false"
+				diskPersistent="false"
+				timeToIdleSeconds="0"
+				timeToLiveSeconds="300"
+				memoryStoreEvictionPolicy="LRU"/>
+
+	</ehcache>
+	```
+3. 在`application.yml`添加缓存配置
+	```
+	# Ehcache 缓存配置
+	cache:
+	  ehcache:
+	    config: classpath:ehcache.xml
+	```
+4. 在入口类添加`@EnableCaching`注解，表示开启缓存  
+5. Java Bean 对象实现序列化，`public class User implements Serializable`  
+6. 在需要使用的地方使用现关注解，实现缓存可以减少从数据库查询的次数  
+
+
+
 ## 附录
 ### 操作代码目录说明
 |  springboot-quickstart  |  springboot-mybatis  |  springboot-crud  |
@@ -556,6 +687,8 @@ public class User {
 10. [参考文档 ———— (十三)SpringBoot2.0热部署Devtools原理](https://blog.csdn.net/IT_hejinrong/article/details/89155308)  
 11. [参考文档 ———— 2021版IDEA没有compiler.automake.allow.when.app.running](https://blog.csdn.net/qq_52978553/article/details/122376118)  
 12. [参考文档 ———— SpringBoot基础之MockMvc单元测试](https://blog.csdn.net/wo541075754/article/details/88983708)  
+13. [参考文档 ———— Ehcache详细解读](http://www.blogjava.net/libin2722/articles/406569.html)  
+14. [参考文档 ———— spring boot接入ehcache](https://blog.csdn.net/xiongzhichao/article/details/52349121)  
  
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
