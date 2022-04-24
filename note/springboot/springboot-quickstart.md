@@ -1,4 +1,4 @@
-# SpringBoot快速入门 🕹0.3.0  
+# SpringBoot快速入门 🕹1.0.0  
 
 
 ## MVC
@@ -180,8 +180,89 @@ public class TestGlobalExceptionHandler {
 
 
 ## 数据校验
-### Spring Validation
+### 为什么要进行后端数据校验
+数据的校验是交互式网站一个不可或缺的功能，前端的`js校验`可以涵盖大部分的校验职责，如用户名唯一性，生日格式，邮箱格式校验等等常用的校验。
+但是一般前端传来的数据是不可信的，前端校验过了，后端也应该重新校验，因为不排除用户绕过浏览器直接通过`Http工具`向后端请求的情况。
+所以服务端的数据校验也是必要的，可以防止脏数据落到数据库中，如果数据库中出现一个非法的邮箱格式，也会让运维人员头疼不已。
 
+### 如何进行后端数据校验
+1. `SpringBoot`中一般使用`Spring Validation`来进行后端数据校验，它是对`Hibernate Validation`进行了二次封装，
+	在`SpringMVC`模块中添加了自动校验，并将校验信息封装进了特定的类中  
+2. 在使用时我们只需要引入`spring-boot-starter-web`依赖即可，该模块会自动依赖`spring-boot-starter-validation`  
+
+### Spring Validation 常用注解
+> @Null：被注释的元素必须为`null`  
+> @NotNull：被注释的元素不能为`null`，可以为空字符串  
+> @AssertTrue：被注释的元素必须为`true`  
+> @AssertFalse：被注释的元素必须为`false`  
+> @Min(value)：被注释的元素必须是一个数字，其值必须大于等于指定的最小值  
+> @Max(value)：被注释的元素必须是一个数字，其值必须小于等于指定的最大值  
+> @DecimalMin(value)：被注释的元素必须是一个数字，其值必须大于等于指定的最小值  
+> @DecimalMax(value)：被注释的元素必须是一个数字，其值必须小于等于指定的最大值  
+> @Size(max,min)：被注释的元素的大小必须在指定的范围内  
+> @Digits(integer,fraction)：被注释的元素必须是一个数字，其值必须在可接受的范围内  
+> @Past：被注释的元素必须是一个过去的日期  
+> @Future：被注释的元素必须是一个将来的日期  
+> @Pattern(value)：被注释的元素必须符合指定的正则表达式  
+> @Email：被注释的元素必须是电子邮件地址  
+> @Length：被注释的字符串的大小必须在指定的范围内  
+> @Range：被注释的元素必须在合适的范围内  
+> @URL：被注解的元素必须是一个`URL`  
+> @NotEmpty：用在集合类上，不能为`null`，并且长度必须大于0  
+> @NotBlank：只能作用在`String`上，不能为`null`，而且调用`trim()`后，长度必须大于0  
+
+### 自定义注解
+**可以参考文章————[Spring自定义注解(validation)](https://blog.csdn.net/ileopard/article/details/123485111)详细学习，这里后期会补上说明**  
+
+### 示例代码
+1. `/com/fx67ll/springboot/controller/UserController.java`在传参的位置添加`@Vaild`注解表示这里的参数需要校验，需要注意JSON格式和表单格式传过来的参数异常会有些区别，需要在后面注意
+	```
+    // 添加用户
+	@PutMapping("/adduser")
+    public ResultInfo saveUser(@RequestBody @Valid User user) {
+        ResultInfo resultInfo = new ResultInfo();
+        userService.saveUser(user);
+        return resultInfo;
+    }
+	```
+2. 在`Bean`文件`/com/fx67ll/springboot/dao/User.java`中私有字段上使用注解来校验，不贴所有代码了，仅贴部分重点代码
+	```
+    @NotBlank(message = "用户名称不能为空！")
+    private String userName;
+	
+    @NotBlank(message = "用户密码不能为空！")
+    @Length(min = 6, max = 20, message = "密码长度最少六位且最多二十位！")
+    private String userPwd;
+	```
+3. 在全局自定义异常拦截中`/com/fx67ll/springboot/exceptions/TestGlobalExceptionHandler.java`向用户返回错误代码和信息
+	```
+	package com.fx67ll.springboot.exceptions;
+
+	import com.fx67ll.springboot.po.vo.ResultInfo;
+	import org.springframework.web.bind.MethodArgumentNotValidException;
+	import org.springframework.web.bind.annotation.ControllerAdvice;
+	import org.springframework.web.bind.annotation.ExceptionHandler;
+	import org.springframework.web.bind.annotation.ResponseBody;
+
+	@ControllerAdvice
+	public class TestGlobalExceptionHandler {
+
+		@ExceptionHandler(value = Exception.class)
+		@ResponseBody
+		public ResultInfo exceptionHandler(Exception exception) {
+			ResultInfo resultInfo = new ResultInfo();
+			resultInfo.setCode(978);
+			resultInfo.setMsg("全局异常拦截，操作失败！");
+			// 全局数据校验，注意！！！使用 json 请求体调用接口，校验异常抛出 MethodArgumentNotValidException
+			if (exception instanceof MethodArgumentNotValidException) {
+				MethodArgumentNotValidException methodArgumentNotValidException = (MethodArgumentNotValidException) exception;
+				resultInfo.setCode(1023);
+				resultInfo.setMsg(methodArgumentNotValidException.getBindingResult().getFieldError().getDefaultMessage());
+			}
+			return resultInfo;
+		}
+	}
+	```
 
 
 ## 静态资源
@@ -839,6 +920,10 @@ SpringBoot缓存实现内部使用SpringCache实现缓存控制，这里集成Eh
 12. [参考文档 ———— SpringBoot基础之MockMvc单元测试](https://blog.csdn.net/wo541075754/article/details/88983708)  
 13. [参考文档 ———— Ehcache详细解读](http://www.blogjava.net/libin2722/articles/406569.html)  
 14. [参考文档 ———— spring boot接入ehcache](https://blog.csdn.net/xiongzhichao/article/details/52349121)  
+15. [参考文档 ———— SpringBoot(十二)： validation常用注解](https://blog.csdn.net/mingyuli/article/details/120434810)  
+16. [参考文档 ———— SpringBoot之——Validator校验相关的注解](https://blog.csdn.net/weixin_49716609/article/details/116003488)  
+17. [参考文档 ———— 强悍的Spring之spring validation](https://blog.csdn.net/steven2xupt/article/details/87452664)  
+18. [json格式校验并显示错误_使用 Spring Validation 优雅地进行参数校验](https://blog.csdn.net/weixin_39542850/article/details/111169911)  
  
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  

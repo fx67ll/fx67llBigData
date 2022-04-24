@@ -9,6 +9,15 @@ everything about bigdata
 |  :----:  |  :----:  |  :----:  |  :----:  |
 |  面试总结  |  技术博文（速攻）  |  项目总结  |  sql练习  |
 
+## 0.2.9.20220425
+* SpringBoot快速入门 `v1.0.0` ***完成***  
+* springboot-mybatis-crud-prod 生产环境示例项目 `v1.0.0` ***完成***  
+* 后续任务安排
+	> 新建github仓库并通过jenkins完成持续化部署到西部数码服务器上  
+	> `fx67ll.xyz`&`ez13.top`添加swagger文档地址到友情链接  
+	> 开放`fx67ll.com`为指定跨域请求地址  
+	> 其他待定......
+
 ## 0.2.8.20220424
 * SpringBoot快速入门 `v0.3.0` **推进**  
 	> Ehcache，Quartz，事务控制，全局异常，数据校验
