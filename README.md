@@ -12,8 +12,8 @@ everything about bigdata
 ## 0.2.9.20220425
 * SpringBoot快速入门 `v1.0.0` ***完成***  
 * springboot-mybatis-crud-prod 生产环境示例项目 `v1.0.0` ***完成***  
-* 后续任务安排
-	> 新建github仓库并通过jenkins完成持续化部署到西部数码服务器上  
+* 后续任务安排，暂时不做
+	> 新建github仓库并通过jenkins完成持续化部署到西部数码服务器上，需要先完成读取外部环境配置文件的操作  
 	> `fx67ll.xyz`&`ez13.top`添加swagger文档地址到友情链接  
 	> 开放`fx67ll.com`为指定跨域请求地址  
 	> 其他待定......
