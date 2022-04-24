@@ -1,4 +1,4 @@
-# Azkaban快速入门
+# Azkaban快速入门 🕹️0.2.0
 
 ## 数据源
 业务系统中的数据库和日志数据  
@@ -134,8 +134,12 @@ jetty.trustpassword=password
 ## Azkaban使用案例
 
 
-#### 参考资料  
-1. [azkaban简介及azkaban部署、原理和使用介绍](https://blog.csdn.net/wt334502157/article/details/116891032)  
-2. [Azkaban快速入门系列(1) | Azkaban的简单介绍](https://blog.csdn.net/qq_16146103/article/details/106198309)  
-3. [大数据---Azkaban快速入门](https://blog.csdn.net/qq_43785075/article/details/120576710)  
-4. [Azkaban教程](https://blog.csdn.net/qq_41072814/article/details/116378508)  
+[azkaban简介及azkaban部署、原理和使用介绍](https://blog.csdn.net/wt334502157/article/details/116891032)  
+[Azkaban快速入门系列(1) | Azkaban的简单介绍](https://blog.csdn.net/qq_16146103/article/details/106198309)  
+[大数据---Azkaban快速入门](https://blog.csdn.net/qq_43785075/article/details/120576710)  
+[Azkaban教程](https://blog.csdn.net/qq_41072814/article/details/116378508)  
+
+
+我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
+如果您喜欢这篇文章，欢迎访问我的 [本文github仓库地址](https://github.com/fx67ll/fx67llBigData/blob/main/note/azkaban/azkaban-quickstart.md)，为我点一颗Star，Thanks~ :)  
+***转发请注明参考文章地址，非常感谢！！！***

@@ -121,6 +121,10 @@
 
 ## Hive 任务优化  
 #### Hive Map 优化  
+1. 复杂文件适当增加map数量，可以依据下面的公式计算，简单来说就是尽可能将文件的大小接近blockSize，也就是128m  
+`computeSliteSize(Math.max(minSize, Math.min(maxSzie, blockSize))) = blockSize = 128m`  
+
+
 #### Hive Reduce 优化
 #### Hive 任务整体优化
 # 从Hive精讲P13继续
