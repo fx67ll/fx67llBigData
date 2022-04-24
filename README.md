@@ -11,7 +11,7 @@ everything about bigdata
 
 ## 0.2.8.20220424
 * SpringBoot快速入门 `v0.3.0` **推进**  
-	> Ehcache
+	> Ehcache，Quartz，事务控制，全局异常，数据校验
 * springboot-mybatis-crud-prod 生产环境示例项目 `v0.2.0` **推进**  
 
 ## 0.2.7.20220423

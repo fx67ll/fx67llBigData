@@ -1,4 +1,20 @@
-# SpringBoot快速入门 🕹️0.3.0  
+# SpringBoot快速入门 🕹0.3.0  
+
+
+## MVC
+### 什么是MVC
+1. MVC三层架构是指：视图层 View、服务层 Service，与持久层 Dao，它们分别完成不同的功能  
+	+ View 层：用于接收用户提交请求的代码在这里编写  
+	+ Service 层：系统的业务逻辑主要在这里完成  
+	+ Dao 层：直接操作数据库的代码在这里编写  
+2. 为了更好的降低各层间的耦合度，在三层架构程序设计中，采用面向抽象编程，即上层对下层的调用，是通过接口实现的，而下层对上层的真正服务提供者，是下层接口的实现类  
+3. 服务标准（接口）是相同的，服务提供者（实现类）可以更换，这就实现了层间解耦合  
+
+### MVC 架构程序的工作流程
+1. 用户通过 View 页面向服务端提出请求，可以是表单请求、超链接请求、AJAX 请求等  
+2. 服务端 Controller 控制器接收到请求后对请求进行解析，找到相应的 Model 对用户请求进行处理  
+3. Model 处理后，将处理结果再交给 Controller  
+4. Controller 在接到处理结果后，根据处理结果找到要作为向客户端发回的响应 View 页面，页面经渲染（数据填充）后，再发送给客户端  
 
 
 ## 使用xml还是注解
@@ -123,6 +139,51 @@ SpringBoot默认使用`LogBack`日志系统，一般主流的日志都是用`log
 3. 使用`taskkill /f /t /im "进程名称"`或者`taskkill /f /t /pid "进程PID"`杀死进程即可  
 
 
+## 事务控制
+### 声明式事务
+**可以参考文章————[SpringBoot声明式事务的简单运用](https://blog.csdn.net/justry_deng/article/details/80828180)详细学习，这里后期会补上说明**
+主要应用在新增修改删除上，应用注解即可  
+
+
+## 全局异常
+### 使用@ControllerAdvice配合@ExceptionHandler
+**可以参考文章————[Springboot系列-@ControllerAdvice使用](https://blog.csdn.net/wangxinyao1997/article/details/103710843)详细学习，这里后期会补上说明**
+此注解其实是一个增强的`Controller`，使用这个`Controller`，可实现三个方面的功能，因为这是SpringMVC提供的功能，所以可以在springboot中直接使用
+1. 全局异常处理 （@ExceptionHandler）
+2. 全局数据绑定 （@InitBinder）
+3. 全局数据预处理 （@ModelAttribute）
+```
+package com.fx67ll.springboot.exceptions;
+
+import com.fx67ll.springboot.po.vo.ResultInfo;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@ControllerAdvice
+public class TestGlobalExceptionHandler {
+    @ExceptionHandler(value = Exception.class)
+    @ResponseBody
+    public ResultInfo exceptionHandler(Exception exception) {
+        ResultInfo resultInfo = new ResultInfo();
+        resultInfo.setCode(978);
+        resultInfo.setMsg("全局异常拦截，操作失败！");
+//        if (exception instanceof ParamsException) {
+//            ParamsException paramsException = (ParamsException) exception;
+//            resultInfo.setMsg(paramsException.getMsg());
+//            resultInfo.setCode(paramsException.getCode());
+//        }
+        return resultInfo;
+    }
+}
+```
+
+
+## 数据校验
+### Spring Validation
+
+
+
 ## 静态资源
 默认配置下，我们可以在`resources`资源目录下存放web应用静态资源文件  
 自定义静态资源路径，可以通过在`spring.resources.static-locations`后面追加一个配置`classpath:/你自定义的配置目录/`，例如：
@@ -200,7 +261,7 @@ spring:
 	+ 放置到外部tomcat中，执行bin目录下start脚本即可  
 
 ### 热部署
-热部署，就是在应用正在运行的时候升级软件，却不需要重新启动应用  
+热部署，就是在应用正在运行的时候升级软件，却不需要重新启动应用，主要应用在开发过程中  
 #### 热部署原理
 1. `spring-boot-devtools`是一个为开发者服务的一个模块，其中最重要的功能就是自动应用代码更改到最新的App上面去，
 	原理是在发现代码有更改之后，重新启动应用，但是速度比手动停止后再启动还要更快，更快指的不是节省出来的手工操作的时间  
@@ -436,22 +497,6 @@ public class TestUserController {
 ```
 
 
-## MVC
-### 什么是MVC
-1. MVC三层架构是指：视图层 View、服务层 Service，与持久层 Dao，它们分别完成不同的功能  
-	+ View 层：用于接收用户提交请求的代码在这里编写  
-	+ Service 层：系统的业务逻辑主要在这里完成  
-	+ Dao 层：直接操作数据库的代码在这里编写  
-2. 为了更好的降低各层间的耦合度，在三层架构程序设计中，采用面向抽象编程，即上层对下层的调用，是通过接口实现的，而下层对上层的真正服务提供者，是下层接口的实现类  
-3. 服务标准（接口）是相同的，服务提供者（实现类）可以更换，这就实现了层间解耦合  
-
-### MVC 架构程序的工作流程
-1. 用户通过 View 页面向服务端提出请求，可以是表单请求、超链接请求、AJAX 请求等  
-2. 服务端 Controller 控制器接收到请求后对请求进行解析，找到相应的 Model 对用户请求进行处理  
-3. Model 处理后，将处理结果再交给 Controller  
-4. Controller 在接到处理结果后，根据处理结果找到要作为向客户端发回的响应 View 页面，页面经渲染（数据填充）后，再发送给客户端  
-
-
 ## Swagger2文档工具
 ### 依赖
 在`pom.xml`中添加以下代码
@@ -548,7 +593,7 @@ public class User {
 ```
 
 
-## 分布式缓存工具Ehcache整合
+## 分布式缓存工具Ehcache
 ### 什么是Ehcache
 `EhCache`是一个`纯Java`的进程内缓存框架，具有快速、精干等特点，是`Hibernate`中默认`CacheProvider`。  
 `Ehcache`是一种广泛使用的开源`Java分布式缓存`，主要面向通用缓存，`Java EE`和`轻量级容器`。  
@@ -667,12 +712,117 @@ SpringBoot缓存实现内部使用SpringCache实现缓存控制，这里集成Eh
 6. 在需要使用的地方使用现关注解，实现缓存可以减少从数据库查询的次数  
 
 
+## 定时调度工具Quartz
+**可以参考文章————[Quartz定时调度](https://blog.csdn.net/yesirwu/article/details/97683166)详细学习，这里后期会补上说明**  
+### 什么是Quartz
+在日常项目运行中，我们总会有需求在某一时间段周期性的执行某个动作，比如每天在某个时间段导出报表，或者每隔多久统计一次现在在线的用户量等。
+在SpringBoot中有Java自带的`java.util.Timer`类，也可以在启动类添加`@EnableScheduling`注解引入定时任务环境
+
+### Quartz的使用
+1. 在`pom.xml`添加依赖
+	```
+	<!--Quartz工具依赖-->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-quartz</artifactId>
+	</dependency>
+	```
+2. 添加`job包`并编写`job任务`，实现`job接口`，并在`execute方法`中实现自己的业务逻辑  
+	```
+	package com.fx67ll.springboot.jobs;
+
+	import org.quartz.*;
+	import org.slf4j.Logger;
+	import org.slf4j.LoggerFactory;
+
+	import java.text.SimpleDateFormat;
+	import java.util.Date;
+
+	public class TestQuartzJob implements Job {
+
+		private Logger logger = LoggerFactory.getLogger(TestQuartzJob.class);
+
+		@Override
+		public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+
+			// 获取整理好的日期时间
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			// 查询触发器名称和触发器属于哪个分组
+			TriggerKey triggerKey = jobExecutionContext.getTrigger().getKey();
+
+			//打印日志
+			logger.info("当前触发器是: " + triggerKey.getName() + "，它所属的组别是: " + triggerKey.getGroup() +
+					"----------触发时间: " + simpleDateFormat.format(new Date()) +
+					"-->" + "Hello fx67ll Spring Boot Quartz......");
+		}
+	}
+	```
+3. 构建调度配置类，创建JobDetail实例并定义Trigger注册到scheduler，启动scheduler开启调度  
+	```
+	package com.fx67ll.springboot.conf;
+
+	import com.fx67ll.springboot.jobs.TestQuartzJob;
+	import org.quartz.*;
+	import org.springframework.context.annotation.Bean;
+	import org.springframework.context.annotation.Configuration;
+
+	@Configuration
+	public class QuartzCOnf {
+		@Bean
+		/**
+		 * 具体的可以被执行的调度程序
+		 */
+		public JobDetail jobDetailTestQuartz(){
+			return JobBuilder.newJob(TestQuartzJob.class).storeDurably().build();
+		}
+
+		@Bean
+		/**
+		 * 第一个测试触发器，主要是配置参数提示什么时候调用
+		 * 应用场景有比如定时发送邮件之类的
+		 */
+		public Trigger triggerTestQuartzFirst(){
+			SimpleScheduleBuilder simpleScheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
+					// 每五秒执行一次
+					.withIntervalInSeconds(1)
+					// 永久重复，一直执行下去
+					.repeatForever();
+			return TriggerBuilder.newTrigger()
+					// 设置触发器名称和分组
+					.withIdentity("triggerTestQuartzFirst","groupTestQuartz")
+					.withSchedule(simpleScheduleBuilder)
+					.forJob(jobDetailTestQuartz())
+					.build();
+		}
+
+		@Bean
+		/**
+		 * 第二个测试触发器
+		 */
+		public Trigger triggerTestQuartzSecond(){
+			return TriggerBuilder.newTrigger()
+					// 设置触发器名称和分组
+					.withIdentity("triggerTestQuartzSecond","groupTestQuartz")
+					// 这里是通过定义表达式来表示每5秒执行一次，后续再深入研究下
+					.withSchedule(CronScheduleBuilder.cronSchedule("0/5 * * * * ? *"))
+					.forJob(jobDetailTestQuartz())
+					.build();
+		}
+	}
+	```
+
+
 
 ## 附录
 ### 操作代码目录说明
-|  springboot-quickstart  |  springboot-mybatis  |  springboot-crud  |
-|  :----:  |  :----:  |  :----:  |
-|  快速入门  |  整合mybatis  |  整套crud操作  |
+|  springboot-quickstart  |  springboot-mybatis  |  springboot-mybatis-crud  |  springboot-mybatis-crud-prod  |
+|  :----:  |  :----:  |  :----:  |  :----:  |
+|  快速入门  |  整合mybatis  |  整套crud操作  |  生产环境开发  |
+#### 操作代码资源地址
+1. [springboot-quickstart](https://github.com/fx67ll/fx67llBigData/tree/main/note/springboot/springboot_projects/springboot-quickstart)  
+2. [springboot-mybatis](https://github.com/fx67ll/fx67llBigData/tree/main/note/springboot/springboot_projects/springboot-mybatis)  
+3. [springboot-mybatis-crud](https://github.com/fx67ll/fx67llBigData/tree/main/note/springboot/springboot_projects/springboot-mybatis-crud)  
+4. [springboot-mybatis-crud-prod](https://github.com/fx67ll/fx67llBigData/tree/main/note/springboot/springboot_projects/springboot-mybatis-crud-prod)  
 
 ### 参考资料
 1. [参考教程 ———— 两天搞定SpringBoot框架](https://www.bilibili.com/video/BV16i4y197zh)  
