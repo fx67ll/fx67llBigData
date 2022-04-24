@@ -17,6 +17,8 @@ everything about bigdata
 	> `fx67ll.xyz`&`ez13.top`添加swagger文档地址到友情链接  
 	> 开放`fx67ll.com`为指定跨域请求地址  
 	> 其他待定......
+* Azkaban快速入门博文 `v0.2.0` **推进**  
+* Hbase面试宝典 `v0.1.0` *开始推进*
 
 ## 0.2.8.20220424
 * SpringBoot快速入门 `v0.3.0` **推进**  
