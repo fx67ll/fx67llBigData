@@ -3,7 +3,7 @@
 ## 题目
 选出所有 bonus < 1000 的员工的 name 及其 bonus。  
 
-### Employee 表单
+### Employee 表
 ```
 +-------+--------+-----------+--------+
 | empId |  name  | supervisor| salary |
@@ -16,7 +16,7 @@
 empId 是这张表单的主关键字
 ```
 
-### Bonus 表单
+### Bonus 表
 ```
 +-------+-------+
 | empId | bonus |
