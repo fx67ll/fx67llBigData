@@ -177,12 +177,6 @@ atlas.authorizer.impl = ranger
 3. Ranger会生成审核日志，包含用户访问的详细信息  
 
 
-[参考视频一 ———— 大数据技术之atlas视频教程](https://www.bilibili.com/video/BV18y4y1r7vC)  
-[参考文档一 ———— 数据治理之元数据管理的利器——Atlas入门宝典](https://blog.csdn.net/xiangwang2206/article/details/121072961)  
-[参考文档一 ———— 数仓元数据管理之Atlas 整合hive HBase Sqoop（2.1.0）](https://blog.csdn.net/xiaohu21/article/details/109230773)  
-[参考文档一 ———— Apache atlas使用说明（UI功能详解）](https://blog.csdn.net/x_iaoa_o/article/details/109581930)  
-
-
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
 如果您喜欢这篇文章，欢迎访问我的 [本文github仓库地址](https://github.com/fx67ll/fx67llBigData/blob/main/note/atlas/atlas-quickstart.md)，为我点一颗Star，Thanks~ :)  
 ***转发请注明参考文章地址，非常感谢！！！***
