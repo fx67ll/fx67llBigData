@@ -1,4 +1,4 @@
-# 大数据面试宝典 🕹️0.1.0  
+# 大数据面试汇总
 
 #### 先说一些废话
 小时候我的数学老师经常会告诫我的一句话就是————知其然知其所以然，所以在以往的工作中我就有总结归纳记录的习惯  
@@ -89,17 +89,17 @@ spark 懒加载
 HDFS写数据过程
 Hadoop的组成
 ### 面试题截图汇总
-![1](zero_files/1.png)
-![2](zero_files/2.png)
-![3](zero_files/3.png)
-![4](zero_files/4.png)
-![5](zero_files/1.jpg)
-![6](zero_files/2.jpg)
-![7](zero_files/3.jpg)
-![8](zero_files/4.jpg)
-![9](zero_files/5.jpg)
+![1](temp_files/1.png)
+![2](temp_files/2.png)
+![3](temp_files/3.png)
+![4](temp_files/4.png)
+![5](temp_files/1.jpg)
+![6](temp_files/2.jpg)
+![7](temp_files/3.jpg)
+![8](temp_files/4.jpg)
+![9](temp_files/5.jpg)
 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
-如果您喜欢这篇文章，欢迎访问我的 [本文github仓库地址](https://github.com/fx67ll/fx67llBigData/blob/main/interview/zero/zero.md)，为我点一颗Star，Thanks~ :)  
+如果您喜欢这篇文章，欢迎访问我的 [本文github仓库地址](https://github.com/fx67ll/fx67llBigData/blob/main/interview/temp/temp.md)，为我点一颗Star，Thanks~ :)  
 ***转发请注明参考文章地址，非常感谢！！！***
