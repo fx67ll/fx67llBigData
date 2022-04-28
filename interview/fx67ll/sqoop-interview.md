@@ -42,3 +42,16 @@ Ads层数据用Sqoop往MySql中导入数据的时候，如果用了orc（Parquet
 方法1: sqoop的sql中对含有特殊字符的字段进行replace操作
 方法2: 使用hive-drop-import-delims，这是sqoop官方提供的一个参数，导入到hive时，遇到特殊字符就会将改字符丢弃
 Sqoop还提供了另一个参数--hive-delims-replacement，它会将特殊字符替换为我们设定的字符。
+
+### Sqoop的全量和增量导入
+1. [【sqoop】sqoop全量/增量导入](https://blog.csdn.net/qq_44065303/article/details/103431518)  
+2. [sqoop全量导入操作](https://blog.csdn.net/weixin_43191162/article/details/105924456)  
+
+### Sqoop介绍
+1. [sqoop知识点总结(全)](https://ropledata.blog.csdn.net/article/details/80905651)  
+
+### Sqoop、DataX、Kettle之间的比较
+1. [大数据hadoop之 三十一.sqoop与datax性能对比](https://www.ljjyy.com/archives/2019/06/100336.html)  
+2. [Datax和Kettle使用场景的对比](https://blog.csdn.net/lzhcoder/article/details/120830522)  
+3. [Datax与Sqoop的对比](https://blog.csdn.net/lzhcoder/article/details/107902791)  
+4. [大数据ETL工具kettle与sqoop对比分析](https://blog.csdn.net/tomalun/article/details/105666133)  
