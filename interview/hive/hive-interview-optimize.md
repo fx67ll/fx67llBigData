@@ -125,10 +125,10 @@ select pt,count(1) from popt_tbaccountcopy_mes where pt = ‘2012-07-04′ group
 ```
 很多时候你会发现任务中不管数据量多大，不管你有没有设置调整reduce个数的参数，任务中一直都只有一个reduce任务；
 其实只有一个reduce任务的情况，除了数据量小于hive.exec.reducers.bytes.per.reducer参数值的情况外，还有以下原因：
-a)    没有group by的汇总，比如把select pt,count(1) from popt_tbaccountcopy_mes where pt = ‘2012-07-04′ group by pt; 写成 select count(1) from popt_tbaccountcopy_mes where pt = ‘2012-07-04′;
+a)没有group by的汇总，比如把select pt,count(1) from popt_tbaccountcopy_mes where pt = ‘2012-07-04′ group by pt; 写成 select count(1) from popt_tbaccountcopy_mes where pt = ‘2012-07-04′;
 这点非常常见，希望大家尽量改写。
-b)    用了Order by
-c)    有笛卡尔积
+b)用了Order by
+c)有笛卡尔积
 通常这些情况下，除了找办法来变通和避免，我暂时没有什么好的办法，因为这些操作都是全局的，所以hadoop不得不用一个reduce去完成；
 同样的，在设置reduce个数的时候也需要考虑这两个原则：使大数据量利用合适的reduce数；使单个reduce任务处理合适的数据量；
 ```
@@ -204,11 +204,6 @@ c)    有笛卡尔积
 	//当输出文件的平均大小小于该值时，启动一个独立的MapReduce任务进行文件merge。
 	set hive.merge.smallfiles.avgsize=16000000;
 	```
-
-#### 参考文档————Hive小文件的相关问题
-1. [Hadoop的Archive归档命令使用指南 ](https://www.cnblogs.com/staryea/p/8603112.html)  
-2. [关于hive中的reduce个数的设置](https://www.cnblogs.com/gxgd/p/9431525.html)  
-3. [hive优化之——控制hive任务中的map数和reduce数](http://lxw1234.com/archives/2015/04/15.htm)  
 
 
 ## Hive数据倾斜
