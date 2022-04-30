@@ -264,27 +264,64 @@ CREATE TABLE IF NOT EXISTS `test_03`(
    `id` INT UNSIGNED AUTO_INCREMENT,
    `deviceId` VARCHAR(100) NOT NULL,
    `alarmDate` VARCHAR(100) NOT NULL,
-   `alarmValue` INT NOT NULL,
+   `alarmValueAvgDaily` INT NOT NULL,
    PRIMARY KEY ( `id` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO test_03 
-( id, deviceId, alarmDate, alarmValue)
+( id, deviceId, alarmDate, alarmValueAvgDaily)
 VALUES
-( 1, "u01", "2022-01-08", 15),
-( 2, "u01", "2022-02-03", 2),
-( 3, "u01", "2022-02-05", 4),
-( 4, "u01", "2022-02-07", 1),
-( 5, "u01", "2022-03-12", 8),
+( 1, "u01", "2022-01-08", 135),
+( 2, "u01", "2022-01-08", 134),
+( 3, "u01", "2022-02-05", 74),
+( 4, "u01", "2022-02-06", 61),
+( 5, "u01", "2022-02-07", 38),
 ( 6, "u02", "2022-01-03", 34),
-( 7, "u02", "2022-02-03", 13),
-( 8, "u03", "2022-02-03", 3),
-( 9, "u03", "2022-01-03", 1),
-( 10, "u03", "2021-05-03", 2);
+( 7, "u02", "2022-01-04", 133),
+( 8, "u03", "2022-01-03", 73),
+( 9, "u03", "2022-02-04", 61),
+( 10, "u03", "2022-01-04", 228),
+( 11, "u03", "2022-02-05", 128),
+( 12, "u03", "2022-01-06", 228),
+( 13, "u03", "2022-02-06", 238),
+( 14, "u03", "2022-02-06", 239),
+( 15, "u04", "2022-01-03", 23),
+( 16, "u04", "2022-01-04", 26),
+( 17, "u04", "2022-01-05", 39),
+( 18, "u04", "2022-01-06", 41),
+( 19, "u04", "2022-04-03", 38),
+( 20, "u04", "2022-05-03", 89);
 
 SELECT * FROM test_03;
 
 -- 统计所有告警设备和所有活跃告警设备的总数，以及平均监测值
+WITH 
+-- 首先去除重复日期的重复数据，这里取最大值
+t1 AS(
+SELECT deviceId,
+		alarmDate,
+		MAX(alarmValueAvgDaily) AS alarmValueAvgDaily
+FROM test_03
+GROUP BY deviceId, alarmDate
+),
+-- 去除重复设备数
+t2 AS(
+SELECT *
+FROM t1
+GROUP BY deviceId
+),
+-- 查询设备总数
+t3 AS(
+SELECT '告警设备总数' AS type,
+		COUNT(deviceId) AS allDeviceCount
+FROM t2
+),
+t4 AS(
+SELECT ROUND(AVG(alarmValueAvgDaily)) AS alarmValueAvgAll
+FROM t1
+)
+-- 统计完成所有告警设备以及平均监测值
+SELECT * FROM t3 LEFT JOIN t4 ON t4.alarmValueAvgAll IS NOT NULL;
 
 
 
