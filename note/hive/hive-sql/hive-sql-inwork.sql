@@ -312,20 +312,45 @@ GROUP BY deviceId
 ),
 -- 查询设备总数
 t3 AS(
-SELECT '告警设备总数' AS type,
+SELECT '告警设备总数与均值' AS type,
 		COUNT(deviceId) AS allDeviceCount
 FROM t2
 ),
+-- 查询总均值
 t4 AS(
 SELECT ROUND(AVG(alarmValueAvgDaily)) AS alarmValueAvgAll
 FROM t1
+),
+-- 查询分组后的排序编号
+t5 AS(
+SELECT *,
+		ROW_NUMBER() OVER(PARTITION BY deviceId ORDER BY alarmDate) AS alarmDateRank
+FROM t1
+),
+-- 查询告警日期减去分组后排序编号之后的日期，如果有连续相同的说明是连续的天数
+t6 AS(
+SELECT *,
+		DATE_SUB(alarmDate, INTERVAL alarmDateRank DAY) AS alarmDateSub
+FROM t5
+),
+-- 查询连续天数大于3天的设备，以及这些活跃设备的平均值
+t7 AS(
+SELECT deviceId,
+		ROUND(AVG(alarmValueAvgDaily))  AS alarmValueAvgActive,
+		alarmDateSub,
+		COUNT(*) AS  alarmDateSubCount
+FROM t6
+GROUP BY deviceId, alarmDateSub
+HAVING alarmDateSubCount>=3  
+),
+t8 AS(
+SELECT '活跃告警设备总数与均值' AS type,
+		COUNT(deviceId) AS allDeviceCount,
+		ROUND(AVG(alarmValueAvgActive)) AS alarmValueAvgActiveAll
+FROM t7
 )
 -- 统计完成所有告警设备以及平均监测值
-SELECT * FROM t3 LEFT JOIN t4 ON t4.alarmValueAvgAll IS NOT NULL;
-
-
-
-
-
-
-
+SELECT * FROM t3 LEFT JOIN t4 ON t4.alarmValueAvgAll IS NOT NULL
+UNION ALL
+-- 统计完成活跃告警设备以及平均监测值
+SELECT * FROM t8;
