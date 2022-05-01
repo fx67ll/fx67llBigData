@@ -1,4 +1,4 @@
-# HiveSQL工作记录 🕹️0.4.0  
+# HiveSQL工作记录 🕹️0.5.0  
 
 ## 统计每个设备的累计告警次数
 ### 原始数据格式
@@ -79,70 +79,85 @@ GROUP BY deviceId,
 |  u03  |  1  |
 |  ...  |  ...  |
 
-### 工作思路以及语句
+### 工作思路
 #### 统计环境设备的总污染告警次数
 1. 由于有设备可能会有同一时间的告警记录，所以需要按告警时间去重后再统计
 2. 如果使用distinct去重，如果表数据过大，且设备ID差异化很大，那么会有性能压力  
 3. 所以使用group by子查询代替  
 4. mysql中的`date_format`格式化需要这样写：`DATE_FORMAT(alarmTime, '%Y-%c-%d %T')`  
-	```sql
-	SELECT deviceId,
-			COUNT(alarmTime) AS alarmCount 
-	FROM
-	--- http://c.biancheng.net/mysql/date_format.html
-	(SELECT deviceId,
-			DATE_FORMAT(REGEXP_REPLACE(alarmTime,'/','-'), 'yyyy-MM-dd HH:mm:ss') AS alarmTime
-	FROM test_01
-	GROUP BY deviceId,alarmTime
-	ORDER BY alarmTime) t
-	GROUP BY deviceId;
-	```
 #### 输出每个设备告警次数排名前三的日期
 1. 使用窗口函数`ROW_NUMBER() OVER()`进行分组排序即可，[MySQL 替换 ROW_NUMBER() OVER (PARTITION ……) 函数](https://blog.csdn.net/liuyaru11/article/details/106685366)  
 2. 多个子句查询可以使用视图和`WITH`语句 
-	```sql
-	SELECT * 
-	FROM 
-	(SELECT deviceId,
-			alarmDate,
-			alarmCount,
-			ROW_NUMBER() OVER(PARTITION BY deviceId ORDER BY alarmCount DESC) AS alarmRank
-	FROM 
-	(SELECT deviceId,
-			alarmDate,
-			COUNT(alarmDate) AS alarmCount
-	FROM
-	(SELECT deviceId,
-			DATE_FORMAT(alarmTime, 'yyyy-MM-dd') AS alarmDate,
-			DATE_FORMAT(alarmTime, 'yyyy-MM-dd HH:mm:ss') AS alarmTime
-	FROM test_01
-	GROUP BY deviceId,alarmTime
-	ORDER BY deviceId,alarmTime) t1
-	GROUP BY deviceId,alarmDate) t2) t3
-	WHERE alarmRank<=3;
 
-	-- 使用WITH语句优化一下
-	WITH t1 AS (
-	SELECT deviceId,
-		DATE_FORMAT(alarmTime, 'yyyy-MM-dd') AS alarmDate,
-		DATE_FORMAT(alarmTime, 'yyyy-MM-dd HH:mm:ss') AS alarmTime
-	FROM test_01
-	GROUP BY deviceId,alarmTime
-	ORDER BY deviceId,alarmTime),
-	t2 AS (
-		SELECT deviceId,
-		alarmDate,
-		COUNT(alarmDate) AS alarmCount
-	FROM t1
-	GROUP BY deviceId,alarmDate),
-	t3 AS (
-	SELECT deviceId,
+### 工作语句
+#### 统计环境设备的总污染告警次数
+```sql
+SELECT deviceId,
+		COUNT(alarmTime) AS alarmCount 
+FROM
+--- http://c.biancheng.net/mysql/date_format.html
+(SELECT deviceId,
+		DATE_FORMAT(REGEXP_REPLACE(alarmTime,'/','-'), 'yyyy-MM-dd HH:mm:ss') AS alarmTime
+FROM test_01
+GROUP BY deviceId,alarmTime
+ORDER BY alarmTime) t
+GROUP BY deviceId;
+```
+#### 输出每个设备告警次数排名前三的日期
+```sql
+SELECT * 
+FROM 
+(SELECT deviceId,
 		alarmDate,
 		alarmCount,
 		ROW_NUMBER() OVER(PARTITION BY deviceId ORDER BY alarmCount DESC) AS alarmRank
-	FROM t2)
-	SELECT * FROM t3 WHERE alarmRank<=3;
-	```
+FROM 
+(SELECT deviceId,
+		alarmDate,
+		COUNT(alarmDate) AS alarmCount
+FROM
+(SELECT deviceId,
+		DATE_FORMAT(alarmTime, 'yyyy-MM-dd') AS alarmDate,
+		DATE_FORMAT(alarmTime, 'yyyy-MM-dd HH:mm:ss') AS alarmTime
+FROM test_01
+GROUP BY deviceId,alarmTime
+ORDER BY deviceId,alarmTime) t1
+GROUP BY deviceId,alarmDate) t2) t3
+WHERE alarmRank<=3;
+
+-- 使用WITH语句优化一下
+WITH t1 AS (
+SELECT deviceId,
+	DATE_FORMAT(alarmTime, 'yyyy-MM-dd') AS alarmDate,
+	DATE_FORMAT(alarmTime, 'yyyy-MM-dd HH:mm:ss') AS alarmTime
+FROM test_01
+GROUP BY deviceId,alarmTime
+ORDER BY deviceId,alarmTime),
+t2 AS (
+	SELECT deviceId,
+	alarmDate,
+	COUNT(alarmDate) AS alarmCount
+FROM t1
+GROUP BY deviceId,alarmDate),
+t3 AS (
+SELECT deviceId,
+	alarmDate,
+	alarmCount,
+	ROW_NUMBER() OVER(PARTITION BY deviceId ORDER BY alarmCount DESC) AS alarmRank
+FROM t2)
+SELECT * FROM t3 WHERE alarmRank<=3;
+```
+#### COUNT(1)和COUNT(*)的区别
+1. 从执行结果来说
+	+ `COUNT(1)`和`COUNT(*)`之间没有区别，因为`COUNT(*)`和`COUNT(1)`都不会去过滤空值  
+	+ 但`COUNT(列名)`就有区别了，因为`COUNT(列名)`会去过滤空值  
+2. 从执行效率来说
+	+ 他们之间根据不同情况会有些许区别，MySQL会对`COUNT(*)`做优化  
+	+ 如果列为主键，`COUNT(列名)`效率优于`COUNT(1)`  
+	+ 如果列不为主键，`COUNT(1)`效率优于`COUNT(列名)`  
+	+ 如果表中存在主键，`COUNT(主键列名)`效率最优  
+	+ 如果表中只有一列，则`COUNT(*)`效率最优  
+	+ 如果表有多列，且不存在主键，则`COUNT(1)`效率优于`COUNT(*)`  
 
 
 ## 统计每个月的总告警次数，总告警设备数，以及能够连续七天数值正常设备数量  
@@ -217,9 +232,8 @@ SELECT * FROM t2 WHERE firstAlarmMonth='2022-1';
 |  ...  |  ...  |
 
 ### 统计之后格式
-|  deviceDistrictSection  |  alarmCount  |
-|  :----:  |  :----:  |
 |  设备地区号段  |  告警次数  |
+|  :----:  |  :----:  |
 |  210000-210010  |  2  |
 |  210010-210020  |  8  |
 |  210020-210030  |  4  |
@@ -327,15 +341,15 @@ SELECT CONCAT(FLOOR(210020/10)*10, '-', (FLOOR(210020/10)+1)*10);  -- 210020-210
 
 
 ## 统计所有告警设备和所有活跃告警设备的总数，以及平均监测值  
-**活跃告警设备是指连续七天都有告警的设备**  
+**活跃告警设备是指连续三天都有告警的设备**  
 #### 连续N天登录等类似题目的解题思路
 1. 日期减去一列数字得到的日期相等  
 2. 后一个日期减去前一个日期的差值相等  
 
 ### 原始数据格式
-|  deviceId  |  alarmDate  |  alarmValue  |
+|  deviceId  |  alarmDate  |  alarmValueAvgDaily  |
 |  :----:  |  :----:  |  :----:  |
-|  设备ID  |  告警日期  |  监测值  |
+|  设备ID  |  告警日期  |  当日平均监测值  |
 |  u01  |  2022-1-8  |  27  |
 |  u02  |  2022-4-5  |  12  |
 |  u03  |  2022-3-2  |  45  |
@@ -345,7 +359,124 @@ SELECT CONCAT(FLOOR(210020/10)*10, '-', (FLOOR(210020/10)+1)*10);  -- 210020-210
 |  ...  |  ...  |
 
 ### 统计之后格式
-|  类型  |  总数  |  平均值  |
+|  类型  |  总数  |  总均值  |
 |  :----:  |  :----:  |  :----:  |
 |  所有告警设备  |  18398  |  34  |
 |  活跃告警设备  |  3213  |  87  |
+
+### 工作思路
+1. 首先使用`group by`去除重复日期的重复数据，用`max`函数取最大值  
+2. 然后使用`group by`去除重复设备数，分别查询设备总数和总平均值，再用左连接将查询结果拼接，保存结果查询  
+3. 接着处理统计活跃告警设备，先用`row_number`函数查询分组编号，再使用`date_sub`函数用告警日期减去分组编号，得出一组临时告警日期用于判定是否是活跃告警设备  
+4. 如果有连续相同日期说明是活跃告警设备，所以接着使用`count`函数和`having`条件统计过滤有大于等于三天的连续相同日期的设备与告警日期，注意同时要计算均值  
+5. 左后统计活跃告警设备总数和平均值，并和第二步中的结果`union all`即可  
+
+### 工作语句
+```sql
+WITH 
+-- 首先去除重复日期的重复数据，这里取最大值
+t1 AS(
+SELECT deviceId,
+		alarmDate,
+		MAX(alarmValueAvgDaily) AS alarmValueAvgDaily
+FROM test_03
+GROUP BY deviceId, alarmDate
+),
+-- 去除重复设备数
+t2 AS(
+SELECT *
+FROM t1
+GROUP BY deviceId
+),
+-- 查询设备总数
+t3 AS(
+SELECT '告警设备总数与均值' AS type,
+		COUNT(deviceId) AS allDeviceCount
+FROM t2
+),
+-- 查询总均值
+t4 AS(
+SELECT ROUND(AVG(alarmValueAvgDaily)) AS alarmValueAvgAll
+FROM t1
+),
+-- 查询分组后的排序编号
+t5 AS(
+SELECT *,
+		ROW_NUMBER() OVER(PARTITION BY deviceId ORDER BY alarmDate) AS alarmDateRank
+FROM t1
+),
+-- 查询告警日期减去分组后排序编号之后的日期，如果有连续相同的说明是连续的天数
+t6 AS(
+SELECT *,
+		DATE_SUB(alarmDate, INTERVAL alarmDateRank DAY) AS alarmDateSub
+FROM t5
+),
+-- 查询连续天数大于3天的设备，以及这些活跃设备的平均值
+t7 AS(
+SELECT deviceId,
+		ROUND(AVG(alarmValueAvgDaily))  AS alarmValueAvgActive,
+		alarmDateSub,
+		COUNT(*) AS  alarmDateSubCount
+FROM t6
+GROUP BY deviceId, alarmDateSub
+HAVING alarmDateSubCount>=3  
+),
+t8 AS(
+SELECT '活跃告警设备总数与均值' AS type,
+		COUNT(deviceId) AS allDeviceCount,
+		ROUND(AVG(alarmValueAvgActive)) AS alarmValueAvgActiveAll
+FROM t7
+)
+-- 统计完成所有告警设备以及平均监测值
+SELECT * FROM t3 LEFT JOIN t4 ON t4.alarmValueAvgAll IS NOT NULL
+UNION ALL
+-- 统计完成活跃告警设备以及平均监测值
+SELECT * FROM t8;
+```
+#### 合并操作符`union`和`union all`之间的区别
+1. 相同之处
+	+ 都是用于合并两个或多个`select`语句的结果组合成单个结果集  
+	+ 操作符内部的每个`select`语句必须拥有相同数量的，列也必须拥有相似的数据类型，同时每个`select`语句中的列的顺序必须相同  
+2. 不同之处
+	+ 对重复结果的处理：`union`在进行表连接后会筛选掉重复的记录，`union all`不会去除重复记录  
+	+ 对排序的处理：`union`将会按照字段的顺序进行排序，`union all`只是简单的将两个结果合并后就返回  
+	+ 从效率上说，`union all`要比 `union`快很多，所以，如果可以确认合并的两个结果集中不包含重复数据且不需要排序时的话，那么就使用`union all`  
+#### Hive和MySQL中的日期函数
+1. [MySQL Date 函数](https://www.runoob.com/sql/sql-dates.html)、[MySQL 日期函数](https://www.runoob.com/mysql/mysql-functions.html)  
+2. [【hive 日期函数】Hive常用日期函数整理](https://blog.csdn.net/u013421629/article/details/80450047)  
+3. *后期切记整理链接资料，若忘记请读者提醒！！！感谢！！！*
+
+
+## 统计2022年1月8日下午16点-17点，每个接口调用量top10的ip地址  
+### 原始数据格式
+|  time  |  interface  |  ip  |
+|  :----:  |  :----:  |  :----:  |
+|  时间  |  接口  |  访问IP  |
+|  2021/1/8 15:01:28  |  /api/user/login  |  110.25.3.56  |
+|  2021/1/8 15:21:12  |  /api/device/alarm  |  23.21.33.87  |
+|  2021/1/8 15:51:34  |  /api/device/record  |  45.76.21.543  |
+|  ...  |  ...  |
+
+### 统计之后格式
+|  接口  |  访问IP  |  访问次数  |  排名  |
+|  :----:  |  :----:  |  :----:  |  :----:  |
+|  /api/user/login  |  110.25.3.56  |  89  |  1  |
+|  /api/device/alarm  |  23.21.33.87  |  123  |  1  |
+|  /api/device/record  |  45.76.21.543  |  23  |  1  |
+|  ...  |  ...  |  ...  |  ...  |
+
+#### 此题作为开放题供大家查阅，后面有空再继续写  
+
+
+## Hive和MySQL中部分函数的区别
+1. `date_format()`  
+	+ Hive `date_format(date date / timestamp time / string 'xxxx-xx-xx', format 'yyyy-MM-dd')`，只能识别用`-`连接的日期字符串  
+	+ MySQL `date_format(date, format)`，具体的format规则请查询[参考资料](http://c.biancheng.net/mysql/date_format.html)  
+2. `date_sub()`  
+	+ Hive `date_sub(date date / timestamp time, int days)`  
+	+ MySQL `date_sub(date, interval 时间间隔 type)`，具体的type规则请查询[参考资料](https://www.runoob.com/sql/func-date-sub.html)  
+
+
+我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
+如果您喜欢这篇文章，欢迎访问我的 [本文github仓库地址](https://github.com/fx67ll/fx67llBigData/blob/main/note/hive/hive-sql-inwork.md)，为我点一颗Star，Thanks~ :)  
+***转发请注明参考文章地址，非常感谢！！！***
