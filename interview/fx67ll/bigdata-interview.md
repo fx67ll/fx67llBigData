@@ -31,6 +31,18 @@
 2. 数据开发分析，hive sql，别人已经完成了集群的搭建和开发，数仓开发纯业务侧了，ETL  
 
 
+## 专业术语
+### ETL
+ETL也就是Extract-Transform-Load，抽取（extract）、转换（transform）、加载（load）  
+
+### 数仓分层
++ ODS层 (Operation Data Store)：原始数据层，存放原始数据，直接加载原始日志、数据，数据保持原貌不做处理  
++ DWD层 (Data Warehouse Detail)：对ODS层数据进行清洗（去除空值，脏数据，超过极限范围的数据）、维度退化脱敏等  
++ DWS层 (Data Warehouse Service)：以DWD为基础，按天进行轻度汇总  
++ DWT层 (Data Warehouse Topic)：以DWS为基础，按主题进行汇总  
++ ADS层 (Application Data Store)：为各种报表提供数据  
+
+
 ## 为什么要数据建模
 为了更好的将数据有序、有结构地分类组织和存储，它强调从业务，数据存取和使用的角度合理存储数据  
 
@@ -46,14 +58,4 @@ OLTP和OLAP
 1. OLTP的全称是On-line Transaction Processing，中文名称是联机事务处理。其特点是会有高并发且数据量级不大的查询，是主要用于管理事务（transaction-oriented)的系统  
 2. OLAP的全称是 On-line Analytical Processing，中文名称是联机分析处理。其特点是查询频率较OLTP系统更低，但通常会涉及到非常复杂的聚合计算  
 
-
-## 专业术语
-### ETL
-ETL也就是Extract-Transform-Load，抽取（extract）、转换（transform）、加载（load）  
-
-### 数仓分层
-+ ODS层 (Operation Data Store)：原始数据层，存放原始数据，直接加载原始日志、数据，数据保持原貌不做处理  
-+ DWD层 (Data Warehouse Detail)：对ODS层数据进行清洗（去除空值，脏数据，超过极限范围的数据）、维度退化脱敏等  
-+ DWS层 (Data Warehouse Service)：以DWD为基础，按天进行轻度汇总  
-+ DWT层 (Data Warehouse Topic)：以DWS为基础，按主题进行汇总  
-+ ADS层 (Application Data Store)：为各种报表提供数据  
+ER建模和维度建模
