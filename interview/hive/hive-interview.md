@@ -1,4 +1,4 @@
-# Hive面试宝典 🕹️0.2.1
+# Hive面试宝典 🕹️0.2.2
 
 #### 先说一些废话
 小时候我的数学老师经常会告诫我的一句话就是————知其然知其所以然，所以在以往的工作中我就有总结归纳记录的习惯，  
@@ -405,10 +405,10 @@ sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然�
 
 ## Hive 函数
 ### 如何使用UDF/UDAF/UDTF  
-Hive中有3种UDF：User Defined Functions（UDF）、User Defined Aggregation Functions（UDAF）、User Defined Table Generating Functions（UDTF）
 ### 为什么使用UDF/UDAF/UDTF   
 ### 你写过什么样的UDF/UDAF/UDTF  
 ### Hive自定义函数实现了什么函数什么接口
+#### 该模块请参考我关于`Hive UDF`的文章  
 
 ### Hive中如何去重
 #### 第一种方式：使用 `DISTINCT`   
@@ -434,9 +434,12 @@ Hive中有3种UDF：User Defined Functions（UDF）、User Defined Aggregation F
 	+ 当数据量规模较大时，不使用 `order by`，使用用 `distribute by + sort by`
 	+ 如果 `distribute by` 和 `sort by` 字段是同一个时，此时，`cluster by = distribute by + sort by`
 
-### 其他待补充说明的函数———— `split` / `coalesce` / `collect list`  
+### 其他待补充说明的函数———— `split` / `coalesce` / `collect list` / `collect set`  
 #### 当前版本请阅读以下参考资料，后期再行完善  
-1. 更多进阶内容请自行百度拓展查阅  
+1. [【Hive】split函数（分割字符串）](https://blog.csdn.net/qq_34105362/article/details/80408621)  
+2. [hive SQL COALESCE 函数](https://blog.csdn.net/weixin_42784951/article/details/114653922)  
+3. [Hive之collect_list()/collect_set()函数](https://blog.csdn.net/LINBE_blazers/article/details/89198019)  
+4. 更多进阶内容请自行百度拓展查阅  
 
 
 ## Hive 运维
@@ -446,7 +449,7 @@ Hive中有3种UDF：User Defined Functions（UDF）、User Defined Aggregation F
 
 
 ## Hive 优化
-#### 该模块请参考另外单独写的一篇关于Hive优化的文章，后期完成后我会在这里添加链接  
+#### 该模块请参考我关于`Hive优化`的文章  
 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
