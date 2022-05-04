@@ -14,7 +14,7 @@
 2. Hive的架构（*） 
 3. Hive的数据（**）  
 	+ Hive的数据模型  
-	+ Hive的底层如何存储Null值  
+	+ *Hive的底层如何存储Null值*  
 	+ Hive中元数据`metadata`和元数据商店`metastore`)`的作用  
 	+ Hive有哪些保存元数据`metadata`的方式  
 	+ Hive元数据存储方式中，本地模式和远程模式的区别  
@@ -29,36 +29,49 @@
 	+ 如何通过 HiveSQL 来直接读写 HBase  
 5. Hive的分区和分桶（**）  
 	+ 什么是Hive分区  
-	+ Hive分区的优点  
-	+ Hive分区的缺点  
+	+ *Hive分区的优点*  
+	+ *Hive分区的缺点*  
 	+ 什么是Hive分桶  
 	+ 关于Hive索引的说明  
-	+ Hive分桶的优点  
-	+ Hive分桶的缺点  
+	+ *Hive分桶的优点*  
+	+ *Hive分桶的缺点*  
 	+ Hive中静态分区和动态分区的区别  
-	+ Hive动态分区的参数设定  
+	+ *Hive动态分区的参数设定*  
 6. Hive的内部表和外部表（*）  
 	+ 什么是Hive的内部表和外部表  
 	+ Hive内部表和外部表的区别是什么  
 	+ 生产环境中为什么建议使用外部表  
 7. Hive SQL（***）  
-	+ Hive中的SQL如何转化成MapReduce的  
-	+ Hive中如何查询A表中B表不存在的数据  
+	+ *Hive中的SQL如何转化成MapReduce任务的*  
+	+ 什么情况下Hive不走MapReduce任务  
+	+ *Hive中如何查询A表中B表不存在的数据*  
 	+ Hive中有哪些连接查询以及如何使用  
 	+ Hive中左连接和内连接的区别  
 	+ Hive中左连接的底层原理  
-	+ Hive查询时候 ON 和 WHERE 有什么区别  
+	+ *Hive查询时候 ON 和 WHERE 有什么区别*  
 8. Hive 函数（***）  
-	+ 如何使用UDF/UDAF/UDTF  
-	+ 为什么使用UDF/UDAF/UDTF  
-	+ 你写过什么样的UDF/UDAF/UDT  
-	+ Hive自定义函数实现了什么函数什么接口   
+	+ *如何使用UDF/UDAF/UDTF*  
+	+ *为什么使用UDF/UDAF/UDTF*  
+	+ *你写过什么样的UDF/UDAF/UDT*  
+	+ *Hive自定义函数实现了什么函数什么接口*   
 	+ Hive中如何去重  
 	+ Hive中排序函数的使用方式及区别  
-	+ 其他待补充说明的函数  
+	+ 请说明以下常用函数 `split` / `coalesce` / `collect list` / `collect set` 的功能  
 9. Hive 运维（*）  
 	+ 如何监控一个提交后的Hive状态  
 10. Hive 优化（***）  
+	+ *请说明你在工作中如何进行Hive优化*  
+	+ HiveSQL优化 ———— Hive单表查询优化  
+	+ HiveSQL优化 ———— Hive多表查询优化  
+	+ HiveSQL优化 ———— Hive其他查询优化  
+	+ Hive数据倾斜 ———— 单表携带了 Group By 字段的查询  
+	+ Hive数据倾斜 ———— 两表或多表的 join 关联时，其中一个表较小，但是 key 集中  
+	+ Hive数据倾斜 ———— 两表或多表的 join 关联时，有 Null值 或 无意义值  
+	+ Hive数据倾斜 ———— 两表或多表的 join 关联时，数据类型不统一  
+	+ Hive数据倾斜 ———— 单独处理倾斜key  
+	+ HiveJob优化 ———— HiveMap优化方案  
+	+ HiveJob优化 ———— HiveReduce优化方案  
+	+ Hive整体优化方案  
 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  

@@ -338,13 +338,15 @@ Hive的分区分桶都是数据存储和组织的策略，分区类似文件的�
 
 
 ## Hive SQL
-### Hive中的SQL如何转化成MapReduce的
+### Hive中的SQL如何转化成MapReduce任务的
 1. `Antlr`定义SQL的语法规则，完成SQL词法，语法解析，将SQL转化为抽象语法树  
 2. 遍历抽象语法树抽象出查询的基本组成单元 `QueryBlock`  
 3. 遍历`QueryBlock` ，翻译为执行操作树`OperatorTree`  
 4. 逻辑层优化器进行`OperatorTree`变换，合并不必要的`ReduceSinkOperator`，减少`shuffle`数据量  
 5. 遍厉`OperatorTree`，翻译为`MapReduce`任务  
 6. 物理层优化器进行`MapReduce`任务的变换，生成最终的执行计划  
+
+### 什么情况下Hive不走MapReduce任务
 
 ### Hive中如何查询A表中B表不存在的数据  
 **题目：A、B两表，找出ID字段中，存在A表，但是不存在B表的数据。A表总共13w数据，去重后大约3W条数据，B表有2W条数据，且B表的ID字段有索引**  
