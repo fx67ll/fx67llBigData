@@ -1,4 +1,4 @@
-# HiveSQL工作记录 🕹️0.5.0  
+# HiveSQL工作记录 🕹️0.5.1  
 
 记录一些工作中有意思的统计指标，当然做过一些简化方便大家阅读，后续会不断更新，欢迎关注追踪~
 
@@ -340,6 +340,20 @@ SELECT CONCAT(FLOOR(210020/10)*10, '-', (FLOOR(210020/10)+1)*10);  -- 210020-210
 	+ 四舍五入的时候，正数，小数位大于5，则整数位加一，小数位小于5，则整数位不变，抹除小数位  
 	+ 负数，小数位小于5，则整数位不变，抹除小数位，小数位大于5，则整数位加一  
 	+ 整数，则不变  
+#### MySQL中保留两位小数
+1. `round(x,d)` 四舍五入保留小数  
+	+ `round(x)`其实就是`round(x,0)`，也就是默认d为0，默认不保留小数，d为保留几位小数  
+	+ d可以是负数，这时是指定小数点左边的d位整数位为0，同时小数位均为0，例如：`round(114.6, -1) -> 110`  
+2. `truncate(x,d)` 函数返回被舍去至小数点后d位的数字x，和`round`函数类似，但是没有四舍五入  
+3. `format(x,d)` 强制保留d位小数，整数部分超过三位的时候以逗号分割，并且返回的结果是`string`类型的  
+4. `convert(value,type)` 类型转换，相当于截取，例如：  
+	+ convert(100.3465, decimal(10,2)) -> 100.35  
+	+ convert(100, decimal(10,2)) -> 100  
+	+ convert(100.4, decimal(10,2)) -> 100.4
+#### Hive中保留两位小数  
+1. `round(column_name,2)` 四舍五入截取 *这种方法慎用，有时候结果不是你想要的*  
+2. `regexp_extract(column_name,'([0-9]*.[0-9][0-9])',1)` 正则匹配截取，不做四舍五入，只是单纯的当作字符串截取  
+3. `cast(column_name as decimal(10,2))` cast函数截取 *推荐使用*  
 
 
 ## 统计所有告警设备和所有活跃告警设备的总数，以及平均监测值  
@@ -479,6 +493,11 @@ SELECT * FROM t8;
 	+ Hive `date_sub(date date / timestamp time, int days)`  
 	+ MySQL `date_sub(date, interval 时间间隔 type)`，具体的type规则请查询[参考资料](https://www.runoob.com/sql/func-date-sub.html)  
 
+### Hive和MySQL常用日期函数
+1. `date_add()` 向日期添加指定的时间间隔  
+2. `date_sub()` 从日期减去指定的时间间隔  
+3. `datediff()` 返回两个日期之间的天数  
+
 ### Hive中`order by`/`distribute by`/`sort by`/`group by`/`partition by`之间的区别说明  
 1. order by  
 	+ `order by`会对数据进行全局排序，和oracle、mysql等数据库中的`order by`效果一样  
@@ -504,6 +523,37 @@ SELECT * FROM t8;
 	+ 在建表的时候通过设置`partition`的字段，会根据该字段对数据分区存放，更具体的说是存放在不同的文件夹  
 	+ 这样通过指定设置`partition`的字段条件查询时可以减少大量的开销  
 	+ 区内排序用`order by`
+
+### MySQL多表查询时如何将`NULL`置为`0`
+使用IFNULL`("字段", 0)`函数即可  
+
+### Hive中如何处理NULL值和空字符串
+1. Hive表中默认将`NULL`存为`\N`，可查看表的源文件（`hadoop fs -cat`或者`hadoop fs -text`），文件中存储大量`\N`，这样造成浪费大量空间  
+2. 但Hive的`NULL`有时候是必须的
+	+ Hive中`insert`语句必须列数匹配，不支持不写入，没有值的列必须使用`NULL`占位  
+	+ Hive表的数据文件中按分隔符区分各个列，空列会保存`NULL（\n）`来保留列位置，
+		但外部表加载某些数据时如果列不够，如表13列，文件数据只有2列，则在表查询时表中的末尾剩余列无数据对应，自动显示为`NULL`  
+3. 所以，NULL转化为空字符串，可以节省磁盘空间
+	+ 建表时直接指定
+	```
+	# 第一种方式
+	ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'  
+	WITH SERDEPROPERTIES ('serialization.null.format' = '')  
+	# 第二种方式
+	 ROW FORMAT DELIMITED NULL DEFINED AS ''  
+	```
+	+ 修改已存在的表
+	```
+	ALTER TABLE hive_tb SET SERDEPROPERTIES('serialization.null.format' = '');
+	```
+4. 使用函数处理NULL值
+	+ `NVL(expr1,expr2)` 如果第一个参数为`NULL`那么显示第二个参数的值，如果第一个参数的值不为`NULL`，则显示第一个参数本来的值  
+	+ `Coalesce(expr1, expr2, expr3….. exprn)` 返回表达式中第一个非空表达式，如果所有自变量均为`NULL`，则 COALESCE 返回`NULL`  
+	```
+	SELECT COALESCE(NULL,null,3,4,5); 　　-- 结果为：3
+	SELECT COALESCE(NULL,null,'',3,4,5);   -- 结果为：''
+	SELECT COALESCE(NULL,null,null,NULL);  -- 结果为：null
+	```
 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
