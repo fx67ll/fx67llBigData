@@ -36,7 +36,7 @@ MySQL查询性能优化是一个很大的课题，往往需要结合实际情况
 ### 如果索引扫描的数据超过30%，那么索引会失效，变成全表扫描，避免给选择性的低的字段建立索引  
 
 ### 对索引进行函数操作之后，索引会失效，执行的是全表查询  
-```
+```sql
 CREATE TABLE t1(
 	id INT NOT NULL PRIMARY KEY,
 	i INT,
@@ -56,7 +56,7 @@ WHERE dt BETWEEN date '2022-01-01' AND date '2022-12-31';
 ```
 
 ### 多个索引，使用查询谓词`where`和排序谓词`order by`均不会影响索引  
-```
+```sql
 CREATE TABLE t2(
 	id INT NOT NULL PRIMARY KEY,
 	i INT,
@@ -74,7 +74,7 @@ LIMIT 5;
 ```
 
 ### 多个索引，使用`where条件`会有最左匹配原则  
-```
+```sql
 CREATE TABLE t3(
 	id INT NOT NULL PRIMARY KEY,
 	col1 INT,
@@ -98,7 +98,7 @@ WHERE col2 = 10;
 ```
 
 ### 对于索引使用前后字符串均模糊查询，会执行全表扫描  
-```
+```sql
 CREATE TABLE t4(
 	id INT NOT NULL PRIMARY KEY,
 	col1 INT,
@@ -120,7 +120,7 @@ WHERE col2 LIKE "sql%";
 ```
 
 ### 多个索引，查询中有字段无索引，会导致覆盖索引 
-```
+```sql
 CREATE TABLE t5(
 	id INT NOT NULL PRIMARY KEY,
 	col1 INT,
