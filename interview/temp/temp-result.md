@@ -1,4 +1,4 @@
-# 大数据面试汇总 🕹️0.3.3
+# 大数据面试汇总 🕹️0.4.0
 
 总结一下自己这些年在大数据面试过程中所遇到的各类问题，仅供参考  
 
@@ -15,21 +15,50 @@
 
 ## 必问基础知识点
 ### 执行过程
-1. MapReduce的执行过程，如何进行一个文件的计算，shuffle的过程（不需要手写mapreduce或者用java写mapreduce）  
-2. HDFS的读写流程  
-3. Yarn的任务提交流程，如何查看任务日志和报错信息  
-4. Hive的执行过程（如何解析成MapReduce的）  
-5. Spark任务的执行过程  
+1. MapReduce 的执行过程，如何进行一个文件的计算，shuffle的过程（不需要手写MapReduce或者用java写MapReduce）  
+	+ [MapReduce执行流程及示例](https://www.jianshu.com/p/5d4f13f38689)  
+2. HDFS 的读写流程  
+	+ [HDFS的读写流程步骤（附图文解析）](https://blog.csdn.net/qq_17685725/article/details/123243677)   
+3. Yarn 的任务提交流程，如何查看任务日志和报错信息  
+	+ [hive的执行流程](https://blog.51cto.com/u_14048416/2342658)  
+4. Hive 的执行过程（Hive SQL 如何解析成MapReduce的）  
+	+ [Hive SQL转化为MapReduce的过程](https://blog.csdn.net/weixin_43823423/article/details/117264918)  
+	+ [hive的执行流程](https://blog.51cto.com/u_14048416/2342658)   
+	+ [万字长文详解HiveSQL执行计划](https://mp.weixin.qq.com/s/3483ib06DFQfhLFOZAv_jA)  
+	+ [Hive SQL底层执行过程详细剖析](https://mp.weixin.qq.com/s/7yffuvCr17naOS7GeV8tTQ)  
+	+ [Hive底层原理：explain执行计划详解](https://mp.weixin.qq.com/s/5a8bBEDgxErBfkhLsTS70g)  
+5. Spark 任务的执行过程  
+	+ [Spark原理 | 任务执行流程](https://www.jianshu.com/p/cdb7c7e81f1a)  
+6. Spark SQL 的底层执行过程
+	+ [Spark SQL底层执行流程详解](https://mp.weixin.qq.com/s/CWdBLhgUrLxlsavTFhA0rA)  
+	+ [Spark底层执行原理详细解析](https://mp.weixin.qq.com/s/qotI36Kx3nOINKHdOEf6nQ)  
 
 ### 工作方向
 1. Spark和Hive查询在工作中遇到什么样的难点？如何解决？  
 2. 大数据集群用的什么集群？CDH吗？
 	+ [大数据学习（一）CDH大数据平台](https://zhuanlan.zhihu.com/p/335663852)    
 
+### Linux
+1. 如何查看内存，CPU占用  
+2. Shell脚本如何定义函数调用
+3. Shell脚本第一行：`#!/bin/bash`的含义  
+	+ 第一行的内容指定了shell脚本解释器的路径，而且这个指定路径只能放在文件的第一行  
+	+ 第一行写错或者不写时，系统会有一个默认的解释器进行解释  
+4. Linux脚本授权是什么？Linux授权命令是什么？  
+	+ `chmod [{ugoa}{+-=}{rwx}] [文件或目录]`  
+	+ `chmod [mode=421] [文件或目录]`  
+5. Shell标准输出和标准错误是什么？  
+
 ### MySQL
 1. sql的执行计划，执行错误报警机制
 2. *如何进行sql调优* **必问**  
 	+ 一条sql语句，多个字段，如何考虑尽量提升效率  
+
+### Hadoop（HDFS/MapReduce/Yarn）
+1. Haddop3对于Hadoop2有哪些新特性  
+	+ [Hadoop 3.x 版本相对于 Hadoop 2.x的新特性](https://mp.weixin.qq.com/s/qCauPHgzRVdDbzZKhz34BA)  
+#### Hadoop面试资料合集
+1. [精选Hadoop高频面试题17道](https://mp.weixin.qq.com/s/yewLzQ2EtjEuvKN6q_MjYQ)  
 
 ### Hive
 1. *工作中如何进行Hive优化* **必问**
@@ -38,9 +67,12 @@
 	+ Hive SQL 查询比较慢，怎么处理  
 	+ Hive的参数设置用过哪些，有什么作用  
 	+ Hive中表关联方式join的分类、用法、应用场景  
-	+ 什么时候会走MapJoin  
+	+ **什么时候会走MapJoin** [mapjoin的使用方法以及注意事项](https://blog.csdn.net/sinat_37574187/article/details/120444216) 
 	+ 什么情况下会产生Hive小文件，小文件有什么危害  
 	+ [Hive在工作中的调优总结](https://fx67ll.xyz/archives/hive-optimize-inwork)  
+	+ [实操 | Hive 数据倾斜问题定位排查及解决](https://mp.weixin.qq.com/s/EzwcPMhqklHK7rMEc-3iyw)  
+	+ [Hive千亿级数据倾斜解决方案](https://mp.weixin.qq.com/s/hz_6io_ZybbOlmBQE4KSBQ)  
+	+ [Hive企业级性能优化](https://mp.weixin.qq.com/s/0YL0skTG9448Os3Md7CIzg)  
 2. Hive的查询过程，哪些方法可以提高查询效率 **变相的问优化**  
 	+ [居然可以百度到](https://blog.csdn.net/weixin_45695430/article/details/123791209)  
 3. Hive的窗口函数，常用窗口函数，怎么使用  
@@ -49,6 +81,8 @@
 		> rank数据相同的，给出并列排名，但是会跳跃  
 		> dense_rank类似于rank，但不会跳跃  
 		> [hive窗口函数之排名函数row_number、rank和dense_rank](https://blog.csdn.net/jianai858/article/details/118490540)  
+		> [Hive窗口函数保姆级教程](https://mp.weixin.qq.com/s/ByAKgzFK_DvyrL7-jr7wVw)  
+		> [Hive窗口函数/分析函数详解](https://mp.weixin.qq.com/s/8LC2yjjGo8J81fZJt6CxkQ)  
 	+ 如何用窗口函数去重  
 4. Hive SQL的数据去重方式  
 	+ distinct、groupby、row_number  
@@ -72,13 +106,13 @@
 	+ Hive SQL会转化为MapReduce， MapReduce会转化为多个task，过多小文件的话，每个文件一个task，每个taskー个JVM实例，JVM的开启与销毀会降低系统效率  
 	+ 合理的分区不应该有过多的分区和文件目录，并且每个目录下的文件应该足够大  
 	+ [Hive中分区是否越多越好？](https://blog.csdn.net/Shockang/article/details/118074010)  
+#### Hive面试资料合集
+1. [一文学完所有的Hive Sql](https://mp.weixin.qq.com/s/Xz31A1rje7vYwGcYzHXfcw)  
 
 ### Hbase
 1. Hbase查询用的多吗，有没有做过优化？  
+	+ [万字长文详解HBase读写性能优化](https://mp.weixin.qq.com/s/1orGDCHQuDmLTenk4Jq4Jw)
 	+ [Hbase快速入门（超精炼总结）](https://zhuanlan.zhihu.com/p/124928432)  
-	+ [http://www.scicat.cn/aa/20211111/852338.html](http://www.scicat.cn/aa/20211111/852338.html)  
-	+ [hbase常用查询命令](http://www.gitweixin.com/?p=686)  
-	+ [Hbase查询性能优化](https://blog.csdn.net/lzxlfly/article/details/82314924)  
 	+ 大多数key-value数据库是为了高频写入而设计的，而不是为了高速读取！用来做高性能查询完全是个方向性错误  
 2. Hbase查询过滤器用过吗，简单介绍下
 	+ RowFilter、FamilyFilter、QualifierFilter、ValueFilter  
@@ -114,28 +148,43 @@
 4. Spark的惰性计算机制了解过吗？（懒加载）  
 	+ [Spark的惰性求值](https://www.jianshu.com/p/2887fc61ad46)  
 4. *工作中如何进行Spark优化？* **必问**   
+	+ [Spark性能优化的10大问题及其解决方案](https://blog.csdn.net/AntKengElephant/article/details/96311384)  
+	+ [Spark 出现的问题及其解决方案](https://blog.csdn.net/qq_16146103/article/details/108180964)  
+	+ [Spark内存管理详解](https://mp.weixin.qq.com/s/sjTJ6BjUaklmIHZpxqNR8g)  
+	+ [详解SparkSQL并行执行多个Job](https://mp.weixin.qq.com/s/2ETmGCdgts3P8YdXjQxJFg)  
+	+ [Spark的两种核心Shuffle详解（面试常问，工作常用）](https://mp.weixin.qq.com/s/S90onC4sOJ77kwUc4SNvvg)  
+	+ [Spark性能调优-Shuffle调优及故障排除篇](https://mp.weixin.qq.com/s/2yT4QGIc7XTI62RhpYEGjw)  
+	+ [Spark性能调优-RDD算子调优篇](https://mp.weixin.qq.com/s/DZ0kDi4t11SGwtnZguI_yg)  
 5. Spark的Stage和Task的划分？Task数目由什么决定？  
 6. Spark的宽窄依赖了解过吗？  
 7. Spark如何查看日志和排查报错问题？  
-8. Spark Streaming怎么保证精准的消费？  
+	+ [如何查看Spark日志与排查报错问题](https://blog.csdn.net/qq_33588730/article/details/109353336)  
+8. 工作中跟有没有遇到到Spark数据倾斜，如何处理的？  
+	+ [详解 Spark 数据倾斜及解决方案](https://mp.weixin.qq.com/s/oho_WMbe-wy5vZkSZIMDhA)  
+9. Spark Streaming怎么保证精准的消费？  
+#### Spark面试资料合集
+1. [Spark面试八股文](https://mp.weixin.qq.com/s/Lx3kWDs_XjhuyibX8dhFMQ)  
+2. [Spark吐血整理](https://mp.weixin.qq.com/s/aohvYfKWwtIUi63qII5jYw)  
+3. [Spark学习笔记](https://mp.weixin.qq.com/s/LnmeBdjc8uYrrKiVKAzL-A)  
+4. [上万字详解Spark Core](https://mp.weixin.qq.com/s/V08jUJ4cMCtxVJQ8JbUdCA)  
 
 ### Kafka  
 1. 简单介绍下kafka的核心概念及个人理解  
 2. Kafka在数据传输过程中遇到重复数据怎么处理  
-3. Kafka如何保证数据不丢失  
+3. Kafka中的ack含义是什么
+	+ [Kafka的ACK含义](https://blog.csdn.net/lbh199466/article/details/89917693)  
+#### Kafka面试八问  
+**[大厂面试官竟然这么爱问Kafka，一连八个Kafka问题把我问蒙了？](https://mp.weixin.qq.com/s/_JMfI7tPanF0SHcH1Nxx0g)**
+1. 为什么要使用Kafka？  
+2. Kafka消费过的消息如何再消费？  
+3. Kafka的数据是放在磁盘上还是内存上，为什么速度会快？  
+4. Kafka数据怎么保障不丢失？  
+5. 采集数据为什么选择Kafka？  
+6. Kafka重启是否会导致数据丢失？  
+7. Kafka宕机了如何解决？  
+8. 为什么Kafka不支持读写分离？  
 
 ### Redis
-
-### Linux
-1. 如何查看内存，CPU占用  
-2. Shell脚本如何定义函数调用
-3. Shell脚本第一行：`#!/bin/bash`的含义  
-	+ 第一行的内容指定了shell脚本解释器的路径，而且这个指定路径只能放在文件的第一行  
-	+ 第一行写错或者不写时，系统会有一个默认的解释器进行解释  
-4. Linux脚本授权是什么？Linux授权命令是什么？  
-	+ `chmod [{ugoa}{+-=}{rwx}] [文件或目录]`  
-	+ `chmod [mode=421] [文件或目录]`  
-5. Shell标准输出和标准错误是什么？  
 
 ### Java
 1. Java的io流分类  
@@ -153,6 +202,8 @@
 5. Java中全局变量、静态全局变量、静态局部变量和局部变量的区别  
 6. Java中重写与重载之间的区别  
 7. Java中的final关键字  
+8. Java的jvm了解吗
+	+ [精选大数据面试真题JVM专项](https://mp.weixin.qq.com/s/0auWlqdL8dK1Yo1uwHzjmQ)  
 	
 ### 常用组件
 1. 项目Hbase的RowKey是如何设计的  
@@ -160,14 +211,22 @@
 3. Sqoop的参数介绍  
 
 ### Flink
-1. Flink-cdc介绍一下
+1. Flink-cdc介绍一下  
+	+ [基于Flink CDC打通数据实时入湖](https://mp.weixin.qq.com/s/nvhK5VUn1MOXDt3_V8QyWg)  
 2. Flink和Spark的区别是什么？  
 3. 你们之前使用Spark做实时，后来为什么使用Flink了？  
 4. Flink的windowapi的分类介绍一下  
-5. Flink的cep了解么？怎么使用的？  
-6. Flink的水位线了解吗？可以具体讲讲吗？  
-7. 你们Flink主要使用api开发还是sql开发？  
-8. 能讲讲Flink双流join是如何实现的吗？  
+5. Flink常用算子介绍一下
+	+ [硬核！一文学完Flink流计算常用算子](https://mp.weixin.qq.com/s/4BVUeXrhSSG0xmOGp5UQog)  
+6. Flink的cep了解么？怎么使用的？  
+7. Flink的水位线了解吗？可以具体讲讲吗？  
+8. 你们Flink主要使用api开发还是sql开发？  
+9. 能讲讲Flink双流join是如何实现的吗？  
+#### Flink面试资料合集
+1. [Flink面试八股文](https://mp.weixin.qq.com/s/b3Z3ZKGU1kj6CapwsiNiDA)  
+2. [Flink面试大全总结](https://mp.weixin.qq.com/s/GCUSaYzGGKM62ibT8g5seA)  
+3. [Flink高频面试题](https://mp.weixin.qq.com/s/9BbHr5kwcxu6ml0izFbwTQ)  
+4. [Flink学习笔记](https://mp.weixin.qq.com/s/fXJzqQ2s6GRza3cCkgiiTw)  
 
 ### clickhouse
 1. 你们有有过clickhouse做join吗？如何保证秒级延迟？  
@@ -176,6 +235,8 @@
 ## 涉及到项目和数仓的问题
 1. 简单介绍一下你们项目中的业务吧  
 2. 能结合业务说说你们的数仓怎么搭建的吗？你负责哪些模块？  
+	+ [结合公司业务分析离线数仓建设](https://mp.weixin.qq.com/s/uUcQZNcRhnK64Al4KIUTeQ)  
+	+ [大数据平台中的企业级数仓建设](https://mp.weixin.qq.com/s/BLK9HVAizEgVYB3jLXiQsQ)  
 3. 你们项目中的人员怎么分配的？  
 4. 你们的`主题`是根据什么来划分，为什么这么划分？  
 5. 你们源数据大概多少张表？  
@@ -183,23 +244,36 @@
 7. 你们的`维度层`是怎么建设的  
 8. *如果在解析日志文件时遇到很多的硬编码，如何使用维度去解决？*  
 9. 你们的项目中有多少个`指标`？负责过多少个？怎么编写的？  
+	+ [数仓中指标-标签，维度-度量，自然键-代理键等常见的概念术语解析](https://mp.weixin.qq.com/s/puEoMCw25E07JePIUtFUmw)  
 10. *如果指标出现同义不同名的情况如何解决？*  
-11. *阿里的`oneData体系`有了解吗？你们如何保证数据质量的？你日常遇到最多的数据质量问题是什么？*  
-12. 你的项目中`离线任务`有多少个？任务执行的时间是什么时候？  
-13. 你的项目中`数据量，日活，漏斗分析`大概是多少？以及其他分析的方向？  
-14. 你们项目中的`业务数据清洗`是怎么做的？  
-15. 数仓的`整体架构`是什么样的？数仓是`如何分层`的？  
-16. 介绍一下项目中的`数据流向` **[可以参考这种用户画像数据流动](https://www.bilibili.com/video/BV1ED4y1R7qM?p=2)**  
-17. 介绍一下项目中`处理后的数据用途`？  
-18. 数仓中的`增量表`和`全量表`分别是怎么做的？有没有用过`拉链表`？  
-19. 工作中有没有遇到的`数据倾斜`？如何处理的？  
-20. 工作中有没有遇到过`断点续传`的问题？怎么处理的 **这个问题具体技术具体处理**  
-21. 你的`数据建模经验`介绍一下？  
-22. `Java框架`在你们项目中的应用？  
-23. 你在*实时开发*的过程中遇到什么问题？如何解决的？  
-24. 你们的*实时模型*是如何进行优化的？怎么评估它是否是一个优质的模型？  
-25. 你们的`任务监控`有做过吗？主要监控什么？  
-26. 你们如何保证`数据的准确性`？  
+11. *阿里的`oneData体系`有了解吗？*  
+	+ [数据中台底层逻辑](https://mp.weixin.qq.com/s/4t9_gZsyBxb0HBFz4SfgIQ)  
+	+ [大数据实践：数据指标中心的建设思路](https://mp.weixin.qq.com/s/2Qd9inws8h14Gw1dKoa45g)  
+	+ [基于OneData的数据仓库建设](https://mp.weixin.qq.com/s/1Aua-Llz20sIDVJk3cuiLw)  
+12. 你们如何保证`数据质量`的？你日常遇到最多的`数据质量`问题是什么？
+	+ [数据仓库之数据质量建设](https://mp.weixin.qq.com/s/p9-2J92QqaNF5vWtNrE_3Q)  
+13. 你的项目中`离线任务`有多少个？任务执行的时间是什么时候？  
+14. 你的项目中`数据量，日活，漏斗分析`大概是多少？以及其他分析的方向？  
+15. 你们项目中的`业务数据清洗`是怎么做的？  
+16. 数仓的`整体架构`是什么样的？数仓是`如何分层`的？  
+	+ [数仓建设 | ODS、DWD、DWM等理论实战](https://mp.weixin.qq.com/s/lNE14-u2Gw2JoZybC1dhSw)  
+	+ [关于数仓建设及数据治理的超全概括](https://mp.weixin.qq.com/s/JyqUdApNfTIT9-k6oc2P2A)  
+	+ [数仓建设 | 谁说ODS层就是简单的数据同步？](https://mp.weixin.qq.com/s/UXusmwpQ0FnII-4mpLo_Xw)  
+17. 介绍一下项目中的`数据流向`  
+	+ [可以参考这种用户画像数据流动](https://www.bilibili.com/video/BV1ED4y1R7qM?p=2)  
+18. 介绍一下项目中`处理后的数据用途`？  
+19. 数仓中的`增量表`和`全量表`分别是怎么做的？有没有用过`拉链表`？  
+20. 工作中有没有遇到的`数据倾斜`？如何处理的？  
+21. 工作中有没有遇到过`断点续传`的问题？怎么处理的 **这个问题具体技术具体处理**  
+22. 你的`数据建模经验`介绍一下？  
+	+ [数据建模知多少？](https://mp.weixin.qq.com/s/1PbG1jBDECvnvuyNCl630g)  
+	+ [通俗易懂数仓建模—Inmon范式建模与Kimball维度建模](https://mp.weixin.qq.com/s/-W4Fh3fDhMJTyj92RuNOaw)  
+	+ [浅谈数仓模型（维度建模）](https://zhuanlan.zhihu.com/p/137454121)  
+23. `Java框架`在你们项目中的应用？  
+24. 你在*实时开发*的过程中遇到什么问题？如何解决的？  
+25. 你们的*实时模型*是如何进行优化的？怎么评估它是否是一个优质的模型？  
+26. 你们的`任务监控`有做过吗？主要监控什么？  
+27. 你们如何保证`数据的准确性`？  
 
 
 ## 工作内容的问题
@@ -275,6 +349,23 @@
 4. 入职后可以想老员工讨教经验，核心组件  
 5. 博客快速浏览一些内容  
 6. 官网提供的一些例子  
+
+
+## 未来技术趋势
+1. [万字详解数据仓库、数据湖、数据中台和湖仓一体](https://mp.weixin.qq.com/s/My8ZWES5MrT-2wgU9UUWsQ)  
+2. [一文读懂大数据实时计算](https://mp.weixin.qq.com/s/ulXyZ4wWOCXr21hWUynRXw)  
+3. [20000字详解大厂实时数仓建设](https://mp.weixin.qq.com/s/USl8UJ0XKccJSy9cdlLThQ)  
+
+
+## 附录
+### 面试资料总结
+1. [大数据面试吹牛草稿V2.0](https://mp.weixin.qq.com/s/Ivp4pjmgWVP-STkP32XjUQ)  
+2. [史上最全大数据面试题​V3.1](https://mp.weixin.qq.com/s/Yc4C-rnsBdI4gTZMS0zHnA)  
+3. [精选大数据面试真题10道](https://mp.weixin.qq.com/s/WnxCEJjNkxxjsTbg0lrd3A)  
+
+### 大厂面试总结
+1. [字节跳动大数据开发面试题-附答案](https://mp.weixin.qq.com/s/OJOVN7a3OVjkF6iwoVBMIg)  
+2. [美团优选大数据开发岗面试真题-附答案详细解析](https://mp.weixin.qq.com/s/UeTxsqHcEkwQG2lW_7F6sA)  
 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
