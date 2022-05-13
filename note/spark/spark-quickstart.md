@@ -1,7 +1,12 @@
-# Spark快速入门 🕹️1.0.0
+# Spark快速入门 🕹️1.1.0
 
 #### 先说一些废话  
 为了方便广大入门菜鸟们准备的一篇关于概念点的简单介绍博客，帮助大家快速上手Spark  
+
+
+## 常用版本
+Spark@3 + Scala@2.12
+
 
 ## 核心模块
 1. spark core  
@@ -67,6 +72,7 @@ object Spark01_WordCount {
 ### 提交应用程序：以及提交时候所用到参数--执行的主类，部署模式，运行类所在的jar包，当前应用的任务参数  
 ### 配置历史服务：如果spark服务挂了，之前的任务就看不到了，所以需要使用历史服务  
 ### 配置高可用：解决单点故障，双master，一般都用zookeeper配置，高可用又叫HA  
+### Master、Worker -> Excutor、Driver
 
 
 ## 核心概念
@@ -164,8 +170,59 @@ sparkContext.stop()
 4. 直接创建 RDD（new），使用 new 的方式直接构造 RDD，一般由 Spark 框架自身使用。
 
 #### RDD算子 Operator，又叫RDD 方法
-1. 转换算子：功能的补充和封装，将旧的RDD包装成新的RDD
-2. 行动算子：触发任务的调度和作业的执行  
+1. Transformations转换算子：功能的补充和封装，将旧的RDD包装成新的RDD  
+	+ *Value类型*
+	+ map：将RDD中的数据项，通过map中的函数映射变为一个新的元素（1进1出）  
+	+ mapPartition：执行结果与map相同，但是可以一次遍历整个patition  
+	+ mapPartitionsWithIndex：类似于mapPartitions，除此之外还会携带分区的索引值  
+	+ mapToPair：返回（k，v）格式的RDD  
+	+ flatMap：对RDD中的数据项，先map再flat（1进多出）  
+	+ flatMapToPair：对RDD中的数据项，先map再flat，在返回（k，v）格式的RDD  
+	+ glom  
+	+ groupBy  
+	+ filter：过滤符合条件的记录数，true的保留、false的过滤  
+	+ sample：抽样，传进一个比例值，可以选择传入参数决定是否有放回的抽样  
+	+ distinct：去重  
+	+ coalesce：常用来减少分区，第二个参数是减少分区的过程中是否产生shuffle，如果用来增加分区，必须设置为true  
+	+ repartition：增加或减少分区，会产生shuffle  
+	+ sortBy：排序  
+	+ *双Value类型*
+	+ intersection：交集  
+	+ union：合并两个数据集，两个数据集的类型要一致，返回新的RDD的分区数是合并RDD分区数的总和  
+	+ subtract：差集  
+	+ zip：将两个RDD中的元素（KV格式/非KV格式）变成一个KV格式的RDD，两个RDD的个数必须相同  
+	+ zipWithIndex：该函数将RDD中的元素和这个元素在RDD中的索引号（从0开始）组合成KV对  
+	+ *Key-Value类型*
+	+ partitionBy  
+	+ groupByKey：作用在KV格式的RDD上，根据Key进行分组，作用在(K,V)，返回(K,Iterable)  
+	+ reduceByKey：将相同的Key根据逻辑进行处理  
+	+ reduceByKey  
+	+ aggregateByKey  
+	+ foldByKey  
+	+ combineByKey  
+	+ sortByKey：作用在K,V格式的RDD上，对Key进行升序或降序排序  
+	+ join：作用在K,V格式的RDD上。根据K进行连接，对（K,V）join(K,W)返回（K,(V,W)）  
+	+ leftOuterJoin：作用在K,V格式的RDD上。根据K进行连接，对（K,V）join(K,W)返回（K,(V,W)），左边中的key为主，只显示左边中存在的key值  
+	+ rightOuterJoin：作用在K,V格式的RDD上。根据K进行连接，对（K,V）join(K,W)返回（K,(V,W)），右边中的key为主，只显示右边中存在的key值  
+	+ fullOuterJoin：作用在K,V格式的RDD上。根据K进行连接，对（K,V）join(K,W)返回（K,(V,W)），两边的key值都显示  
+	+ cogroup：当调用类型(K,V)和(K,W)的数据上时，返回一个数据集(K, (Iterable, Iterable))，会产生shuffle  
+2. Action行动算子：触发任务的调度和作业的执行  
+	+ reduce  
+	+ collect：将计算结果回收到Driver端  
+	+ count：返回数据集中的元素数，会在结果计算完成后返回到Driver端  
+	+ countByKey：作用到KV格式的RDD上，根据Key计数相同Key的数据集元素，返回相同Key的元素对应的条数  
+	+ countByValue：作用到KV格式的RDD上，根据数据集每个元素相同的内容来计数，返回相同内容的元素对应的条数  
+	+ first：返回数据集中的第一个元素`first=take(1)`  
+	+ take：返回一个包含数据集前n个元素的集合`take(n)`  
+	+ takeOrdered：返回排序后的前n个元素  
+	+ aggregate  
+	+ fold，aggregate简化版  
+	+ countByKey  
+	+ saveAsTextFile  
+	+ saveAsObjectFile  
+	+ saveAsSequenceFile  
+	+ foreach：循环遍历数据集中的元素，运行相应的逻辑  
+	+ foreachPartition：遍历的是一个patition上的数据  
 [参考这篇文章所列的详细说明记忆](https://blog.csdn.net/weixin_44966780/article/details/122323347)  
 *后续再查询一下大全，算子非常重要需要死记硬背，先背常用，面试应该不会全部问*
 
@@ -606,3 +663,73 @@ object SparkTest {
   }
 }
 ```
+
+## Spark案例实操
+### 日志类文件操作
+1. 日志文件的操作基本都是`WordCount`  
+2. 统计排名类的需求，可以使用算子，也可以使用自定义累加器（Accumulator）  
+3. 优化方向就是避免`Shuffle`  
+	+ 有些运算需要将各节点上的同一类数据汇集到某一节点进行计算，把这些分布在不同节点的数据按照一定的规则汇集到一起的过程称为`Shuffle`  
+	+ `Shuffle`是一个涉及到`CPU（序列化反序列化）`、`网络 I/O（跨节点数据传输）`以及`磁盘I/O（Shuffle中间结果落地）`的操作  
+	+ [Spark Shuffle 详解](https://zhuanlan.zhihu.com/p/67061627)  
+#### 触发Shuffle的操作
+1. repartition相关：repartition、coalesce  
+2. *ByKey操作：groupByKey、reduceByKey、combineByKey、aggregateByKey等  
+3. join相关：cogroup、join  
+
+### 日志文件信息
+日期、用户ID、SessionID、页面ID、动作时间、动作内容（搜索关键字，点击品类ID，点击产品ID，下单品类ID，下单产品ID，支付品类ID，支付产品ID）  
+1. 数据文件每行数据用下划线分割  
+2. 每行数据表示用户的一次行为，这个行为只能是搜索、点击、下单、支付，这四种行为当中的一种  
+3. 如果搜索关键词为null，表示数据不是搜索数据  
+4. 如果点击品类ID和点击产品ID为-1，表示数据不是点击数据  
+5. 针对下单行为，一次可以下单多次商品，所以品类ID和产品ID可以是多个，ID之间用逗号隔开，如果本次不是下单行为，数据用null表示  
+6. 支付与下单相同  
+#### 需求
+1. 热门品类Top10（简易排名：点击数多 -> 下单数多 -> 支付数多）  
+2. Top10热门品类中每个品类的Top10活跃Session统计  
+3. 页面单跳转换率统计，主要是为了知晓从首页最终跳转到支付页面的用户数量（首页(500w) -> 产品列表(400w) -> 页面详情(300w) -> 订单页面(100w) -> 支付页面(10w)）
+	+ 什么是页面单跳转换率，比如一个用户在一次 Session 过程中访问的页面路径 3,5,7,9,10,21，那么页面 3 跳到页面 5 叫一次单跳，7-9 也叫一次单跳，
+	+ 那么单跳转化率就是要统计页面点击的概率，比如：计算 3-5 的单跳转化率，先获取符合条件的 Session 对于页面 3 的访问次数（PV）为 A，
+	+ 然后获取符合条件的 Session 中访问了页面 3 又紧接着访问了页面 5 的次数为 B，那么 B/A 就是 3-5 的页面单跳转化率
+##### 页面单跳转换率统计思路
+1. 根据Session分组统计用户行为  
+2. 根据时间戳信息排序用户的行为（sessionid,timestamp,首页 -> sessionid,timestamp,产品列表 -> sessionid,timestamp,页面详情 -> sessionid,timestamp,订单页面 -> sessionid,timestamp,支付页面）  
+3. 去掉每条信息的无用内容，只保留行为信息（首页 -> 产品列表 -> 页面详情 -> 订单页面 -> 支付页面）  
+4. 分别统计各个行为的总数（首页行为总数 / 产品列表行为总数 / 页面详情行为总数 / 订单页面行为总数 / 支付页面行为总数）  
+5. 分子(产品列表行为总数) / 分母(首页行为总数)，其他类比即可  
+
+### 工程化
+1. web应用中是 `MVC（model - view -controller）`  
+2. 大数据领域没有view，所以它的三层架构是
+	+ controller，控制层，调度  
+	+ service，服务层，服务  
+	+ dao，持久层，操作数据库或者读取文件  
+3. 目录：application、bean、common、controller、dao、service、util  
+#### Java中的工具类ThreadLocal，避免SparkContext在controller和service中传递，增加耦合  
+```
+object EnvUtil {
+	private val scLocal = new ThreadLocal[SprakContext]();
+	def put( sc : SparkContext ): Unit = {
+		scLocal.set(sc);
+	}
+	def take(): SparkContext = {
+		scLocal.get();
+	}
+	def clear(): Unit = {
+		scLocal.remove();
+	}
+}
+```
+
+## Spark SQL
+### Spark SQL 特点
+封装RDD -> DataFrame、DataSet
+可以使用相同的方式连接不同的数据源 -> Hbase、Hive、MySQL、文件  
+兼容Hive
+使用JDBC和ODBC  
+
+
+我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
+如果您喜欢这篇文章，欢迎访问我的 [本文github仓库地址](https://github.com/fx67ll/fx67llBigData/blob/main/note/spark/spark-quickstart.md)，为我点一颗Star，Thanks~ :)  
+***转发请注明参考文章地址，非常感谢！！！***
