@@ -1,19 +1,13 @@
-# 大数据面试汇总 🕹️0.4.0
+# 大数据面试汇总 🕹️0.4.1
+# 2023大数据面试总结
 
-总结一下大数据面试的各类问题，仅供参考  
+#### 先说些废话  
+作为一个全栈开发工作者，曾经对公司专职的大数据开发有着浓厚的兴趣，所以尝试学习大数据开发所需要的各种技术栈。
+本文就是我在学习过程中记录下，所遇到的一些大数据面试的提问，仅供参考。  
+当然，因为时间精力有限，并非所有的问题我都去记录了答案，如果您不了解某些问题或者不认可我记录的解答，可以带着问题百度或者问ChatCPT，相信会给您留下更深刻的印象。  
+最后，读者可以把本文当作模拟面试的提纲，欢迎各位在评论区交流，大家一起成长，努力变得更强！！！
 
-## 有点意思但是暂时不太了解的
-1. 埋点数据缺失怎么处理，埋点数据相关的表示如何设计的？  
-2. 零点漂移如何解决？  
-3. Spark和Hive查询中遇到过什么难点？  
-4. 多线程，线程启动个数如何确定？最多多少？（是指java多线程？）  
-5. Hive中如何反查哪条sql执行较慢？  
-6. 有做过用户路径模型吗？每条路径的转化率是多少？（是不是类似页面单跳率那种）  
-7. 你们的OLAP引擎主要用的什么？为什么这样选型？  
-8. 能聊聊`端到端的一致性`和`精准一次消费`吗？  
-
-
-## 必问基础知识点
+## 高频基础知识点
 ### 执行过程
 1. MapReduce 的执行过程，如何进行一个文件的计算，shuffle的过程（不需要手写MapReduce或者用java写MapReduce）  
 	+ [MapReduce执行流程及示例](https://www.jianshu.com/p/5d4f13f38689)  
@@ -33,13 +27,9 @@
 	+ [Spark SQL底层执行流程详解](https://mp.weixin.qq.com/s/CWdBLhgUrLxlsavTFhA0rA)  
 	+ [Spark底层执行原理详细解析](https://mp.weixin.qq.com/s/qotI36Kx3nOINKHdOEf6nQ)  
 
-### 工作方向
-1. Spark和Hive查询在工作中遇到什么样的难点？如何解决？  
-2. 大数据集群用的什么集群？CDH吗？
-	+ [大数据学习（一）CDH大数据平台](https://zhuanlan.zhihu.com/p/335663852)    
-
 ### Linux
 1. 如何查看内存，CPU占用  
+	+ [linux下查看cpu使用率和内存占用](https://blog.csdn.net/weixin_44431371/article/details/131528718)  
 2. Shell脚本如何定义函数调用
 3. Shell脚本第一行：`#!/bin/bash`的含义  
 	+ 第一行的内容指定了shell脚本解释器的路径，而且这个指定路径只能放在文件的第一行  
@@ -48,27 +38,36 @@
 	+ `chmod [{ugoa}{+-=}{rwx}] [文件或目录]`  
 	+ `chmod [mode=421] [文件或目录]`  
 5. Shell标准输出和标准错误是什么？  
+6. 工作中常用的Linux命令有哪些？
 
 ### MySQL
 1. sql的执行计划，执行错误报警机制
-2. *如何进行sql调优* **必问**  
-	+ 一条sql语句，多个字段，如何考虑尽量提升效率  
+2. 索引有什么优缺点
+3. 什么时候会导致索引失效
+4. 如果我给一张表的所有字段添加索引会有什么样的问题
+5. *如何进行sql调优* **高频**  
+	+ [MySQL在工作中的优化方案总结](https://fx67ll.xyz/archives/mysql-optimize)  
 
 ### Hadoop（HDFS/MapReduce/Yarn）
 1. Haddop3对于Hadoop2有哪些新特性  
 	+ [Hadoop 3.x 版本相对于 Hadoop 2.x的新特性](https://mp.weixin.qq.com/s/qCauPHgzRVdDbzZKhz34BA)  
-#### Hadoop面试资料合集
-1. [精选Hadoop高频面试题17道](https://mp.weixin.qq.com/s/yewLzQ2EtjEuvKN6q_MjYQ)  
+2. HDFS 常用命令有哪些
+	+ [HDFS常用命令](https://blog.csdn.net/m0_56602092/article/details/126704878)  
+3. 工作中遇到 MapReduce 流程的相关问题如何排查
+4. 其他问题汇总
+	+ [精选Hadoop高频面试题17道](https://mp.weixin.qq.com/s/yewLzQ2EtjEuvKN6q_MjYQ)  
 
 ### Hive
-1. *工作中如何进行Hive优化* **必问**
-	+ Hive中有任务跑的时间比较长，怎么优化  
-	+ Hive任务处理过程中遇到过什么样的问题
-	+ Hive SQL 查询比较慢，怎么处理  
-	+ Hive的参数设置用过哪些，有什么作用  
-	+ Hive中表关联方式join的分类、用法、应用场景  
-	+ **什么时候会走MapJoin** [mapjoin的使用方法以及注意事项](https://blog.csdn.net/sinat_37574187/article/details/120444216) 
-	+ 什么情况下会产生Hive小文件，小文件有什么危害  
+1. *工作中如何进行Hive优化* **高频**
+	+ **同类型问题：**Hive中有任务跑的时间比较长，怎么优化  
+	+ **同类型问题：**Hive任务处理过程中遇到过什么样的问题
+	+ **同类型问题：**Hive SQL 查询比较慢，怎么处理  
+	+ **同类型问题：**Hive的参数设置用过哪些，有什么作用  
+	+ **同类型问题：**Hive中表关联方式join的分类、用法、应用场景  
+	+ **同类型问题：**什么时候会走MapJoin   
+	+ **同类型问题：**什么情况下会产生Hive小文件，小文件有什么危害  
+	+ [Hive在工作中的调优总结](https://fx67ll.xyz/archives/hive-optimize-inwork)  
+	+ [mapjoin的使用方法以及注意事项](https://blog.csdn.net/sinat_37574187/article/details/120444216)
 	+ [Hive在工作中的调优总结](https://fx67ll.xyz/archives/hive-optimize-inwork)  
 	+ [实操 | Hive 数据倾斜问题定位排查及解决](https://mp.weixin.qq.com/s/EzwcPMhqklHK7rMEc-3iyw)  
 	+ [Hive千亿级数据倾斜解决方案](https://mp.weixin.qq.com/s/hz_6io_ZybbOlmBQE4KSBQ)  
@@ -106,8 +105,10 @@
 	+ Hive SQL会转化为MapReduce， MapReduce会转化为多个task，过多小文件的话，每个文件一个task，每个taskー个JVM实例，JVM的开启与销毀会降低系统效率  
 	+ 合理的分区不应该有过多的分区和文件目录，并且每个目录下的文件应该足够大  
 	+ [Hive中分区是否越多越好？](https://blog.csdn.net/Shockang/article/details/118074010)  
-#### Hive面试资料合集
-1. [一文学完所有的Hive Sql](https://mp.weixin.qq.com/s/Xz31A1rje7vYwGcYzHXfcw)  
+10. 如何反查哪条Hive SQL执行较慢？  
+	+ [【Hive】从执行计划DAG中执行慢的Task，找到对应SQL逻辑片段](https://blog.csdn.net/weixin_45500089/article/details/120022345)  
+	+ [一文学完所有的Hive Sql](https://mp.weixin.qq.com/s/Xz31A1rje7vYwGcYzHXfcw)
+11. Hive查询在工作中遇到什么样的难点？如何解决？
 
 ### Hbase
 1. Hbase查询用的多吗，有没有做过优化？  
@@ -119,7 +120,9 @@
 	+ SingleColumnValueFilter、SingleColumnValueExcludeFilter、PrefixFilter、PageFilter  
 	+ 多过滤器综合查询FilterList
 	+ [HBase过滤器查询](https://blog.csdn.net/weixin_43230682/article/details/108169525)  
-3. 用户画像的构建是Hbase做的吗？特征值怎么提取的？
+3. 用户画像的构建是Hbase做的吗？特征值怎么提取的？  
+4. 项目Hbase的RowKey是如何设计的？
+	+ [HBase RowKey设计和实现](https://blog.csdn.net/weixin_45462732/article/details/128698296)  
 
 ### Scala
 1. Scala有什么特性
@@ -144,10 +147,10 @@
 ### Spark
 1. 你了解Spark的序列化吗？Spark提供了哪些序列化类？  
 2. Spark中RDD持久化了解过吗？  
-3. *Spark算子分类？常用算子？怎么使用的？*  **必问**  
+3. *Spark算子分类？常用算子？怎么使用的？*  **高频**  
 4. Spark的惰性计算机制了解过吗？（懒加载）  
 	+ [Spark的惰性求值](https://www.jianshu.com/p/2887fc61ad46)  
-4. *工作中如何进行Spark优化？* **必问**   
+4. *工作中如何进行Spark优化？* **高频**   
 	+ [Spark性能优化的10大问题及其解决方案](https://blog.csdn.net/AntKengElephant/article/details/96311384)  
 	+ [Spark 出现的问题及其解决方案](https://blog.csdn.net/qq_16146103/article/details/108180964)  
 	+ [Spark内存管理详解](https://mp.weixin.qq.com/s/sjTJ6BjUaklmIHZpxqNR8g)  
@@ -162,6 +165,7 @@
 8. 工作中跟有没有遇到到Spark数据倾斜，如何处理的？  
 	+ [详解 Spark 数据倾斜及解决方案](https://mp.weixin.qq.com/s/oho_WMbe-wy5vZkSZIMDhA)  
 9. Spark Streaming怎么保证精准的消费？  
+10. Spark在工作中遇到什么样的难点？如何解决？
 #### Spark面试资料合集
 1. [Spark面试八股文](https://mp.weixin.qq.com/s/Lx3kWDs_XjhuyibX8dhFMQ)  
 2. [Spark吐血整理](https://mp.weixin.qq.com/s/aohvYfKWwtIUi63qII5jYw)  
@@ -171,7 +175,8 @@
 ### Kafka  
 1. 简单介绍下kafka的核心概念及个人理解  
 2. Kafka在数据传输过程中遇到重复数据怎么处理  
-3. Kafka中的ack含义是什么
+3. Kafka在使用过程中如何保证数据不丢失
+4. Kafka中的ack含义是什么
 	+ [Kafka的ACK含义](https://blog.csdn.net/lbh199466/article/details/89917693)  
 #### Kafka面试八问  
 **[大厂面试官竟然这么爱问Kafka，一连八个Kafka问题把我问蒙了？](https://mp.weixin.qq.com/s/_JMfI7tPanF0SHcH1Nxx0g)**
@@ -183,8 +188,6 @@
 6. Kafka重启是否会导致数据丢失？  
 7. Kafka宕机了如何解决？  
 8. 为什么Kafka不支持读写分离？  
-
-### Redis
 
 ### Java
 1. Java的io流分类  
@@ -204,11 +207,7 @@
 7. Java中的final关键字  
 8. Java的jvm了解吗
 	+ [精选大数据面试真题JVM专项](https://mp.weixin.qq.com/s/0auWlqdL8dK1Yo1uwHzjmQ)  
-	
-### 常用组件
-1. 项目Hbase的RowKey是如何设计的  
-2. Flume的源头数据  
-3. Sqoop的参数介绍  
+9. 多线程，线程启动个数如何确定？最多多少？  
 
 ### Flink
 1. Flink-cdc介绍一下  
@@ -274,6 +273,11 @@
 25. 你们的*实时模型*是如何进行优化的？怎么评估它是否是一个优质的模型？  
 26. 你们的`任务监控`有做过吗？主要监控什么？  
 27. 你们如何保证`数据的准确性`？  
+28. 埋点数据缺失怎么处理，埋点数据相关的表示如何设计的？  
+29. 零点漂移如何解决？  
+30. 有做过用户路径模型吗？每条路径的转化率是多少？（是不是类似页面单跳率那种）  
+31. 你们的OLAP引擎主要用的什么？为什么这样选型？  
+32. 能聊聊`端到端的一致性`和`精准一次消费`吗？
 
 
 ## 工作内容的问题
@@ -284,19 +288,6 @@
 5. 如果一周内让你做十个紧急的需求，你会怎么办？ 
 6. 你们部门之间是直接进行对接吗？  
 7. 有没有反驳过产品提出的需求，如果不合理怎么办？  
-
-
-## 关于sql题的汇总
-1. 找出连续三天及三天以上都有营业额，且营业额都在上涨的店铺  
-```
-# 输出每天营业额，按时间倒序  
-# 然后侧视图排序1.2.3.4 取出小于等于3的数据  
-# 这个的结果出来后行专列 
-# 生成店铺名name，第一天额度day1，第二天额度day2，第三天额度day3 等四列  
-# 然后where条件day3 > day2 > day1  
-```
-2. 姓名、学历、分数，统计总分前六名  
-3. 找出两表中都有的ID
 
 
 ## 各种组件需要学到什么样的程度  
@@ -316,7 +307,7 @@
 5. spark的应用：批处理，流处理流计算（flink和sparkstreaming），数据分析，图形计算  
 
 ### spark面试重点
-1. 一些八股文知识点，基本原理，是必问且必须熟练知晓的，核心原理的流程和图  
+1. 一些八股文知识点，基本原理，是高频且必须熟练知晓的，核心原理的流程和图  
 2. spark常见报错的解决方案
 	+ real spark冲突怎么解决  
 	+ om怎么处理，driver的om和excute的om分别怎么处理  
