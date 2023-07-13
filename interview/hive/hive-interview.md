@@ -1,8 +1,8 @@
-# Hive面试宝典 🕹️0.2.2
+# Hive面试宝典 🕹️0.2.3
+# 2023 Hive 面试大纲
 
 #### 先说一些废话
-小时候我的数学老师经常会告诫我的一句话就是————知其然知其所以然，所以在以往的工作中我就有总结归纳记录的习惯，
-今天再详细的编写一下关于Hive面试内容的博客，希望读者喜欢，有什么错误不对的地方欢迎在评论区指出  
+总结一下Hive面试大纲，方便读者快速过一遍Hive面试所需要的知识点
 
 
 ## Hive的介绍
@@ -406,11 +406,12 @@ sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然�
 
 
 ## Hive 函数
-### 如何使用UDF/UDAF/UDTF  
-### 为什么使用UDF/UDAF/UDTF   
-### 你写过什么样的UDF/UDAF/UDTF  
-### Hive自定义函数实现了什么函数什么接口
-#### 该模块请参考我关于`Hive UDF`的文章  
+### 关于 UDF/UDAF/UDTF 的提问
+1. 如何使用UDF/UDAF/UDTF 
+2. 为什么使用UDF/UDAF/UDTF   
+3. 你写过什么样的UDF/UDAF/UDTF  
+4. Hive自定义函数实现了什么函数
+*上述四个问题自行 [参考资料](https://blog.csdn.net/sinat_30316741/article/details/113753651) 并结合工作中实际场景来作答，没有标准答案*
 
 ### Hive中如何去重
 #### 第一种方式：使用 `DISTINCT`   
@@ -421,11 +422,9 @@ sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然�
 #### 第二种方式：使用 `GROUP BY`  
 1. 对`GROUP BY`后面所有字段去重，并不能只对一列去重  
 #### 第三种方式：使用 `ROW_NUMBER() OVER` 窗口函数
-**当前版本请阅读以下参考资料，后期再行完善**  
-1. [一种巧妙的hive sql数据去重方法](https://blog.csdn.net/shuaiqig/article/details/116228534)  
-2. [Hive--数据去重及row_number()](https://blog.csdn.net/ABCDEFG0929/article/details/89190450)  
-3. [Hive(十一)--数据去重及row_number()](https://blog.csdn.net/yimingsilence/article/details/70140877)  
-4. 更多进阶内容请自行百度拓展查阅  
+1. 参考资料一：[一种巧妙的hive sql数据去重方法](https://blog.csdn.net/shuaiqig/article/details/116228534)  
+2. 参考资料二：[Hive--数据去重及row_number()](https://blog.csdn.net/ABCDEFG0929/article/details/89190450)  
+3. 参考资料三：[Hive(十一)--数据去重及row_number()](https://blog.csdn.net/yimingsilence/article/details/70140877)  
 
 ### Hive中排序函数的使用方式及区别  
 1. `order by` 会对输入做全局排序，为保证全局的排序，因此只有一个reducer，会导致当输入规模较大时，需要较长的计算时间。
@@ -436,12 +435,14 @@ sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然�
 	+ 当数据量规模较大时，不使用 `order by`，使用用 `distribute by + sort by`
 	+ 如果 `distribute by` 和 `sort by` 字段是同一个时，此时，`cluster by = distribute by + sort by`
 
-### 其他待补充说明的函数———— `split` / `coalesce` / `collect list` / `collect set`  
-#### 当前版本请阅读以下参考资料，后期再行完善  
-1. [【Hive】split函数（分割字符串）](https://blog.csdn.net/qq_34105362/article/details/80408621)  
-2. [hive SQL COALESCE 函数](https://blog.csdn.net/weixin_42784951/article/details/114653922)  
-3. [Hive之collect_list()/collect_set()函数](https://blog.csdn.net/LINBE_blazers/article/details/89198019)  
-4. 更多进阶内容请自行百度拓展查阅  
+### Hive中部分高频函数 ———— `split` / `coalesce` / `collect list` / `collect set`  
+1. [Hive ———— split](https://blog.csdn.net/qq_34105362/article/details/80408621)  
+2. [Hive ———— coalesce](https://blog.csdn.net/weixin_42784951/article/details/114653922)  
+3. [Hive ———— collect list/collect set](https://blog.csdn.net/LINBE_blazers/article/details/89198019)  
+
+### Hive常用函数
+1. [Hive常用的函数总结](https://blog.csdn.net/weixin_44318830/article/details/110738201)  
+2. [Hive函数大全](https://blog.csdn.net/yezonghui/article/details/121293294)  
 
 
 ## Hive 运维
@@ -451,7 +452,9 @@ sql4: 建议这么写，大家写sql大部分的语义都是先过滤数据然�
 
 
 ## Hive 优化
-#### 该模块请参考我关于`Hive优化`的文章  
+*该模块请参考我关于`Hive优化`的文章*  
+1. 点击访问 ————> [Hive在工作中的调优总结](https://fx67ll.xyz/archives/hive-optimize-inwork)  
+2. 点击访问 ————> [HiveSQL工作实战总结](https://fx67ll.xyz/archives/hive-sql-inwork)  
 
 
 我是 [fx67ll.com](https://fx67ll.com)，如果您发现本文有什么错误，欢迎在评论区讨论指正，感谢您的阅读！  
