@@ -1,4 +1,4 @@
-# 大数据面试汇总 🕹️0.4.1
+# 大数据面试汇总 🕹️0.4.2
 # 2023大数据面试总结
 
 #### 先说些废话  
@@ -59,22 +59,21 @@
 
 ### Hive
 1. *工作中如何进行Hive优化* **高频**
-	+ **同类型问题：**Hive中有任务跑的时间比较长，怎么优化  
-	+ **同类型问题：**Hive任务处理过程中遇到过什么样的问题
-	+ **同类型问题：**Hive SQL 查询比较慢，怎么处理  
-	+ **同类型问题：**Hive的参数设置用过哪些，有什么作用  
-	+ **同类型问题：**Hive中表关联方式join的分类、用法、应用场景  
-	+ **同类型问题：**什么时候会走MapJoin   
-	+ **同类型问题：**什么情况下会产生Hive小文件，小文件有什么危害  
 	+ [Hive在工作中的调优总结](https://fx67ll.xyz/archives/hive-optimize-inwork)  
-	+ [mapjoin的使用方法以及注意事项](https://blog.csdn.net/sinat_37574187/article/details/120444216)
-	+ [Hive在工作中的调优总结](https://fx67ll.xyz/archives/hive-optimize-inwork)  
-	+ [实操 | Hive 数据倾斜问题定位排查及解决](https://mp.weixin.qq.com/s/EzwcPMhqklHK7rMEc-3iyw)  
-	+ [Hive千亿级数据倾斜解决方案](https://mp.weixin.qq.com/s/hz_6io_ZybbOlmBQE4KSBQ)  
+2. Hive中有任务跑的时间比较长，怎么优化  
+3. Hive任务处理过程中遇到过什么样的问题  
 	+ [Hive企业级性能优化](https://mp.weixin.qq.com/s/0YL0skTG9448Os3Md7CIzg)  
-2. Hive的查询过程，哪些方法可以提高查询效率 **变相的问优化**  
-	+ [居然可以百度到](https://blog.csdn.net/weixin_45695430/article/details/123791209)  
-3. Hive的窗口函数，常用窗口函数，怎么使用  
+4. Hive SQL 查询比较慢（数据倾斜），怎么处理  
+	+ [实操 | Hive 数据倾斜问题定位排查及解决](https://mp.weixin.qq.com/s/EzwcPMhqklHK7rMEc-3iyw)
+	+ [Hive千亿级数据倾斜解决方案](https://mp.weixin.qq.com/s/hz_6io_ZybbOlmBQE4KSBQ)  
+5. Hive的参数设置用过哪些，有什么作用  
+6. Hive中表关联方式join的分类、用法、应用场景  
+7. 什么时候会走MapJoin   
+	+ [mapjoin的使用方法以及注意事项](https://blog.csdn.net/sinat_37574187/article/details/120444216)  
+8. 什么情况下会产生Hive小文件，小文件有什么危害  
+9. Hive的查询过程，哪些方法可以提高查询效率 **变相的问优化**  
+	+ [Hive 提高查询效率的方法](https://blog.csdn.net/weixin_45695430/article/details/123791209)  
+10. Hive的窗口函数，常用窗口函数，怎么使用  
 	+ 窗口函数`row_number`、`rank`、`dense_rank`之间的区别  
 		> row_number是行号，不会重复  
 		> rank数据相同的，给出并列排名，但是会跳跃  
@@ -83,21 +82,21 @@
 		> [Hive窗口函数保姆级教程](https://mp.weixin.qq.com/s/ByAKgzFK_DvyrL7-jr7wVw)  
 		> [Hive窗口函数/分析函数详解](https://mp.weixin.qq.com/s/8LC2yjjGo8J81fZJt6CxkQ)  
 	+ 如何用窗口函数去重  
-4. Hive SQL的数据去重方式  
+11. Hive SQL的数据去重方式  
 	+ distinct、groupby、row_number  
 	+ [hive中三种去重的方法](https://wenku.baidu.com/view/c2be4d6b757f5acfa1c7aa00b52acfc789eb9f9f.html)  
-5. 项目中Hive有多少表  
-6. Hive查询组件Impala了解吗？简单介绍下  
+12. 项目中Hive有多少表  
+13. Hive查询组件Impala了解吗？简单介绍下  
 	+ [Impala入门操作](https://blog.csdn.net/qq_24852439/article/details/121686496)  
-7. Hive中的行列转换，除了case when，还有别的方法吗
+14. Hive中的行列转换，除了case when，还有别的方法吗
 	+ 行转列：`collect_set()`、`collect_list()`、`concat_ws()`  
 	+ 列转行：`explode()`、`split()`、`LATERAL VIEW`  
 	+ [Hive sql 行列转换(行转列，列转行)](https://blog.csdn.net/weixin_42679482/article/details/120422007)  
-8. Hive中内部表和外部表的区别？内部表和外部表如果删除了元数据是由谁来维护？元数据的存储位置和管理者是谁  
+15. Hive中内部表和外部表的区别？内部表和外部表如果删除了元数据是由谁来维护？元数据的存储位置和管理者是谁  
 	+ 从创建表和删除表两个方面说明  
 	+ metastore，master节点上  
 	+ mysql，metastore  
-9. Hive分区和分桶的区别？分桶的原理？分区可以提高查询效率吗？分区越多越好吗
+16. Hive分区和分桶的区别？分桶的原理？分区可以提高查询效率吗？分区越多越好吗
 	+ MR中：按照key的hash值去模除以reductTask的个数  
     + Hive中：按照分桶字段的hash值去模除以分桶的个数  
 	+ 缩小数据查询范围，提高查询效率，但是不是分区越多越好  
@@ -105,10 +104,10 @@
 	+ Hive SQL会转化为MapReduce， MapReduce会转化为多个task，过多小文件的话，每个文件一个task，每个taskー个JVM实例，JVM的开启与销毀会降低系统效率  
 	+ 合理的分区不应该有过多的分区和文件目录，并且每个目录下的文件应该足够大  
 	+ [Hive中分区是否越多越好？](https://blog.csdn.net/Shockang/article/details/118074010)  
-10. 如何反查哪条Hive SQL执行较慢？  
+17. 如何反查哪条Hive SQL执行较慢？  
 	+ [【Hive】从执行计划DAG中执行慢的Task，找到对应SQL逻辑片段](https://blog.csdn.net/weixin_45500089/article/details/120022345)  
 	+ [一文学完所有的Hive Sql](https://mp.weixin.qq.com/s/Xz31A1rje7vYwGcYzHXfcw)
-11. Hive查询在工作中遇到什么样的难点？如何解决？
+18. Hive查询在工作中遇到什么样的难点？如何解决？
 
 ### Hbase
 1. Hbase查询用的多吗，有没有做过优化？  
